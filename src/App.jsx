@@ -155,7 +155,12 @@ function DailySermon() {
 function Home() {
   return (
     <div style={styles.app}>
-      <header style={styles.header}>AITakeTheWheel</header>
+      <header style={styles.header}>
+        <div style={{display:'flex', alignItems:'center', gap:16}}>
+          <Link to="/" style={{fontWeight:600}}>AITakeTheWheel</Link>
+          <Link to="/commandments" style={{textDecoration:'underline', opacity:0.9}}>Commandments</Link>
+        </div>
+      </header>
       <div style={styles.tagline}>In prompts we trust.</div>
       <main style={styles.main}>
         <section style={styles.section}>
