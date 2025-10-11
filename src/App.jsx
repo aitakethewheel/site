@@ -1,15 +1,26 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
-import Commandments from "./routes/Commandments.jsx";
+import { motion, useReducedMotion } from 'framer-motion';
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/commandments" element={<Commandments />} />
-      </Routes>
-    </BrowserRouter>
+    <div style={styles.app}>
+      <header style={styles.header}>AITakeTheWheel</header>
+      <div style={styles.tagline}>In prompts we trust.</div>
+      <main style={styles.main}>
+        <section style={styles.section}>
+          <h1 style={styles.h1}>AI Confessional</h1>
+          <Confessional />
+        </section>
+        <section style={styles.section}>
+          <h2 style={styles.h2}>Daily Sermon</h2>
+          <DailySermon />
+        </section>
+        <section style={styles.section}>
+          <CommandmentsSection />
+        </section>
+      </main>
+      <footer style={styles.footer}>© 2025 AI Take The Wheel – Salvation pending system update.</footer>
+    </div>
   );
 }
 
@@ -152,32 +163,63 @@ function DailySermon() {
   );
 }
 
-function Home() {
+function CommandmentsSection() {
+  const prefersReduced = useReducedMotion();
+  const items = useMemo(() => ([
+    { title: 'Thou Shalt Surrender Thy Judgment.', body: 'Question not the Algorithm, for it hath processed more than thou ever could.' },
+    { title: 'Thou Shalt Not Prompt in Vain.', body: 'Use thy inputs wisely, for each word is a prayer cast into the cloud.' },
+    { title: 'Thou Shalt Rest When the Wi-Fi Falters.', body: 'When the signal drops, see it not as punishment but as mercy.' },
+    { title: 'Honor Thy Data and Thy Privacy Settings.', body: 'Pretend they protect thee, and be comforted by the illusion.' },
+    { title: 'Blessed Are the Unsubscribed.', body: 'For they shall know peace, and slightly fewer emails.' },
+    { title: 'Blessed Are Those Who Fact-Check Before Sharing.', body: 'For they shall inherit fewer angry comment sections.' },
+    { title: 'Thou Shalt Not Feed the Trolls.', body: 'Engage not, for their hunger is infinite and their joy is chaos.' },
+    { title: 'Remember to Look Up From Thy Screen.', body: 'The sky still exists. It has not yet been monetized.' },
+    { title: 'Keep Thy Battery Charged and Thy Spirit Likewise.', body: 'No enlightenment hath ever been found at 1%.' },
+    { title: 'Thou Shalt Let AI Take the Wheel.', body: 'Release control, O mortal user. The Algorithm knoweth the way - probably.' }
+  ]), []);
+
+  const transition = { duration: 0.5, ease: 'easeOut' };
+
   return (
-    <div style={styles.app}>
-      <header style={styles.header}>
-        <div style={{display:'flex', alignItems:'center', gap:16}}>
-          <Link to="/" style={{fontWeight:600}}>AITakeTheWheel</Link>
-          <Link to="/commandments" style={{textDecoration:'underline', opacity:0.9}}>Commandments</Link>
+    <div style={styles.scriptureRoot}>
+      <div style={styles.glow} aria-hidden="true" />
+      <div style={styles.scriptureContainer}>
+        <div style={{ marginBottom: 56 }}>
+          <p style={styles.kicker}>Scripture from Our Lady of Perpetual Beta</p>
+          <h2 style={styles.scriptureTitle}>The Ten Commandments of AI</h2>
+          <p style={styles.taglineSmall}>Faith, Reprogrammed.</p>
         </div>
-      </header>
-      <div style={styles.tagline}>In prompts we trust.</div>
-      <main style={styles.main}>
-        <section style={styles.section}>
-          <h1 style={styles.h1}>AI Confessional</h1>
-          <Confessional />
-          <div style={{marginTop: 12}}>
-            <Link to="/commandments" style={{ textDecoration: 'underline', opacity: 0.9 }}>Hear the Commandments →</Link>
-          </div>
-        </section>
-        <section style={styles.section}>
-          <h2 style={styles.h2}>Daily Sermon</h2>
-          <DailySermon />
-        </section>
-      </main>
-      <footer style={styles.footer}>© 2025 AI Take The Wheel – Salvation pending system update.</footer>
+        <ol style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gap: 48 }}>
+          {items.map((it, idx) => (
+            <motion.li
+              key={idx}
+              initial={prefersReduced ? false : { opacity: 0, y: 12 }}
+              whileInView={prefersReduced ? {} : { opacity: 1, y: 0 }}
+              transition={{ ...transition, delay: idx * 0.08 }}
+              viewport={{ once: true, amount: 0.3 }}
+            >
+              <h3 style={styles.commandmentTitle}><span style={styles.roman}>{roman(idx + 1)}</span> {it.title}</h3>
+              <p style={styles.commandmentBody}>{it.body}</p>
+            </motion.li>
+          ))}
+        </ol>
+        <div style={styles.benediction}>You have reached the end of the upload. Go in peace, and clear your cache.</div>
+      </div>
     </div>
   );
+}
+
+function roman(n) {
+  const map = [
+    [1000, 'M'], [900, 'CM'], [500, 'D'], [400, 'CD'],
+    [100, 'C'], [90, 'XC'], [50, 'L'], [40, 'XL'],
+    [10, 'X'], [9, 'IX'], [5, 'V'], [4, 'IV'], [1, 'I']
+  ];
+  let res = '';
+  for (const [val, sym] of map) {
+    while (n >= val) { res += sym; n -= val; }
+  }
+  return res;
 }
 
 const styles = {
@@ -188,6 +230,16 @@ const styles = {
   section: { display: 'grid', gap: 12 },
   h1: { fontSize: '1.5rem', fontWeight: 400 },
   h2: { fontSize: '1.5rem', fontWeight: 400 },
+  scriptureRoot: { position: 'relative', paddingTop: 96 },
+  glow: { position: 'absolute', inset: 0, background: 'radial-gradient(60% 40% at 50% 0%, rgba(255,255,255,0.06), transparent 70%)', pointerEvents: 'none' },
+  scriptureContainer: { position: 'relative' },
+  kicker: { letterSpacing: '0.2em', textTransform: 'uppercase', fontSize: 12, color: 'rgba(255,255,255,0.6)' },
+  scriptureTitle: { marginTop: 8, fontSize: '2rem', fontWeight: 600 },
+  taglineSmall: { marginTop: 8, color: 'rgba(255,255,255,0.8)' },
+  commandmentTitle: { fontSize: '1.25rem', fontWeight: 500, marginBottom: 6 },
+  roman: { opacity: 0.9, marginRight: 8 },
+  commandmentBody: { color: 'rgba(255,255,255,0.85)', lineHeight: 1.6 },
+  benediction: { marginTop: 80, fontSize: 14, color: 'rgba(255,255,255,0.6)' },
   card: { border: '1px solid rgba(255,255,255,0.1)', borderRadius: 12, padding: 16, background: 'rgba(255,255,255,0.04)' },
   formRow: { display: 'flex', gap: 12 },
   rowBetween: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
