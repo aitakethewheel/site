@@ -18,3 +18,12 @@ button, input, textarea {
 }
 
 img { display: block; max-width: 100%; height: auto; }
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .reduce-motion * {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+  }
+}

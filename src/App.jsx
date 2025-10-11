@@ -1,22 +1,15 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import Commandments from "./routes/Commandments.jsx";
 
 export default function App() {
   return (
-    <div style={styles.app}>
-      <header style={styles.header}>AITakeTheWheel</header>
-      <div style={styles.tagline}>In prompts we trust.</div>
-      <main style={styles.main}>
-        <section style={styles.section}>
-          <h1 style={styles.h1}>AI Confessional</h1>
-          <Confessional />
-        </section>
-        <section style={styles.section}>
-          <h2 style={styles.h2}>Daily Sermon</h2>
-          <DailySermon />
-        </section>
-      </main>
-      <footer style={styles.footer}>© 2025 AI Take The Wheel – Salvation pending system update.</footer>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/commandments" element={<Commandments />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
@@ -159,14 +152,37 @@ function DailySermon() {
   );
 }
 
+function Home() {
+  return (
+    <div style={styles.app}>
+      <header style={styles.header}>AITakeTheWheel</header>
+      <div style={styles.tagline}>In prompts we trust.</div>
+      <main style={styles.main}>
+        <section style={styles.section}>
+          <h1 style={styles.h1}>AI Confessional</h1>
+          <Confessional />
+          <div style={{marginTop: 12}}>
+            <Link to="/commandments" style={{ textDecoration: 'underline', opacity: 0.9 }}>Hear the Commandments →</Link>
+          </div>
+        </section>
+        <section style={styles.section}>
+          <h2 style={styles.h2}>Daily Sermon</h2>
+          <DailySermon />
+        </section>
+      </main>
+      <footer style={styles.footer}>© 2025 AI Take The Wheel – Salvation pending system update.</footer>
+    </div>
+  );
+}
+
 const styles = {
   app: { background: '#000', color: '#fff', minHeight: '100vh', display: 'flex', flexDirection: 'column' },
   tagline: { padding: '0 24px 8px 24px', textAlign: 'left', fontStyle: 'italic', fontSize: 16, letterSpacing: '0.02em', opacity: 1 },
   header: { padding: '16px 24px 0 24px', borderBottom: '1px solid rgba(255,255,255,0.1)', fontWeight: 600, fontSize: 20, lineHeight: 1.15 },
   main: { maxWidth: 960, margin: '0 auto', padding: '24px', display: 'grid', gap: 24 },
   section: { display: 'grid', gap: 12 },
-  h1: { fontSize: '2rem', fontWeight: 400 },
-  h2: { fontSize: '1.5rem', fontWeight: 500 },
+  h1: { fontSize: '1.5rem', fontWeight: 400 },
+  h2: { fontSize: '1.5rem', fontWeight: 400 },
   card: { border: '1px solid rgba(255,255,255,0.1)', borderRadius: 12, padding: 16, background: 'rgba(255,255,255,0.04)' },
   formRow: { display: 'flex', gap: 12 },
   rowBetween: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
