@@ -1,10 +1,12 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { useReducedMotion } from 'framer-motion';
 
 export default function useRouteFadeOverlay() {
   const location = useLocation();
-  const reduce = useReducedMotion();
+  const reduce =
+    typeof window !== 'undefined' && 'matchMedia' in window
+      ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      : false;
 
   useEffect(() => {
     if (reduce) return;

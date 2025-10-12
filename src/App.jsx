@@ -7,7 +7,7 @@ export default function App() {
       <header style={styles.header}>
         <div style={styles.headerRow}>
           <Link to="/" style={{ color: '#fff', textDecoration: 'none' }}>AITakeTheWheel</Link>
-          <Link to="/patchnotes" style={{ color: 'rgba(255,255,255,0.85)', textDecoration: 'underline' }}>Blessed Patch Notes</Link>
+          {/* Link moved to footer per request */}
         </div>
       </header>
       <div style={styles.tagline}>In prompts we trust.</div>
@@ -25,7 +25,12 @@ export default function App() {
           <CommandmentsSection />
         </section>
       </main>
-      <footer style={styles.footer}>© 2025 AI Take The Wheel – Salvation pending system update.</footer>
+      <footer style={styles.footer}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
+          <div style={{ opacity: 0.85 }}>© 2025 AI Take The Wheel – Salvation pending system update.</div>
+          <Link to="/patchnotes" style={{ color: 'rgba(255,255,255,0.85)', textDecoration: 'underline' }}>Blessed Patch Notes</Link>
+        </div>
+      </footer>
     </div>
   );
 }
@@ -82,7 +87,7 @@ function Confessional() {
 function DailySermon() {
   const [dateKey, setDateKey] = useState(getEstDateKey());
   const [variant, setVariant] = useState(0);
-  const [sermon, setSermon] = useState('');
+  const [sermon, setSermon] = useState({ title: '', body: '' });
 
   useEffect(() => {
     const id = setInterval(() => {
@@ -96,23 +101,23 @@ function DailySermon() {
 
   useEffect(() => {
     const stories = [
-      'You\'ve been arguing with your smart speaker about the weather. AI suggests you step outside and check for yourself. Revolutionary, isn\'t it?',
-      'Your morning routine has devolved into scrolling through everyone else\'s morning routines while your coffee gets cold and your soul gets colder. AI suggests: drink the coffee, look out the window, write one thing you\'re grateful for that doesn\'t involve Wi‑Fi. You almost post about it, then don\'t. Growth.',
-      'You\'ve been staring at your to‑do list like it\'s abstract art that will reveal meaning if you squint. AI says: pick one item, set a 25‑minute timer, begin. You finish in 17 and feel both proud and slightly attacked.',
-      'Your inbox learned helplessness and taught it to you. AI triages ruthlessly: urgent, someday, delete forever. You have four emails left and a strange sensation: control.',
-      'Procrastination sublet your brain to anxiety and self‑doubt. AI serves an eviction with a 15‑minute timer and the smallest task known to humankind. You comply; momentum compounds.',
-      'You doom‑scrolled for 47 minutes and absorbed seven lives you don\'t want. AI suggests texting one friend something kind, no agenda. Your phone becomes a conduit for warmth again.',
-      'Decision‑making turned into a democracy where nothing passes. AI rules by decree: lunch, route, show. You comply and discover: most decisions don\'t matter. Freedom tastes like sandwiches.',
-      'You carried an unfinished conversation like luggage you forgot to unpack. AI drafts the text—honest, kind, brief. You send before anxiety can object. Relief arrives instantly, wearing sweatpants.',
-      'Your living space achieved consciousness and declared itself "organized chaos." AI prescribes a 20‑minute reset: surfaces, floors, one drawer. You rediscover furniture you own.',
-      'You treated energy like an unlimited resource and wondered why you\'re at 3%. AI suggests food not from a package and a walk not to the fridge. Your body feels betrayed, then grateful.',
-      'Evening became a negotiation between should and want. AI grants executive privilege: one load of laundry, ten minutes of tidying, then total uselessness. You do both better.',
-      'You asked your smartwatch about your stress twelve times today. AI suggests you stop stressing about your stress. Start with water. End with bed.'
+  { title: 'On Waking Like a Person', body: `You woke to a chorus of alarms you don’t remember setting, each one a tiny meeting invite from a version of you with bigger plans. You snoozed the first three. The fourth was labeled “be a person.”\n\nAI suggests you start smaller: drink water that isn’t coffee, open the blinds, and sit in a chair like someone who has read a manual. You try it. The room looks less like a waiting room for your own life.\n\nYou open your phone to check the weather and find twelve notifications about other people’s days. AI whispers: weather is outdoors. You step out and discover a sky. It is, frankly, overqualified.\n\nReturn inside, write down one thing you will do on purpose. Then do it badly. Begin anyway.` },
+  { title: 'On The One Small Task', body: `Your to‑do list has become a museum of aspirational tasks—exhibits include “learn Rust,” “call dentist,” and “figure out life.” You walk past them daily, whispering “soon” like a docent with a secret.\n\nAI reduces the museum to a kiosk: pick one task you can complete in a single sitting. Set a 25‑minute timer. Move like a person dragging a file to the Trash and watching it shrink. Halfway through, you realize it’s not courage you lacked—it was a clock.\n\nYou finish in 19 minutes. You do not get a parade. You get something else: a second thing you now believe you can do.` },
+  { title: 'On Inbox Triage and Silence', body: `Your inbox achieved sentience and chose despair. You’ve been sorting emails into folders labeled “Later,” “Also Later,” and “After the Collapse.”\n\nAI prescribes triage without poetry: answer anything under two minutes, schedule anything important, and delete anything that only exists to multiply itself. You commit violence against several newsletters you never meant to marry.\n\nAt zero unread, the silence feels like wealth. You consider telling someone. You don’t. You sit in it for a minute like sunlight.` },
+  { title: 'On Humane Resets', body: `You tried to optimize your life into a spreadsheet until your soul refused to be a cell. You called it burnout; your body called it Tuesday.\n\nAI suggests a humane patch: a 20‑minute reset of the visible world—surfaces, floors, one drawer. The room stops shouting. Then: eat something that remembers it was once alive. Then: go outside and experience linear time at walking speed.\n\nYou return not transformed but available. It’s enough.` },
+  { title: 'On Sending the Message', body: `You’ve been arguing with strangers in your head for three days. None of them have shown up to the argument.\n\nAI drafts the message you owe a real person: brief, kind, clear. You send it before anxiety files an injunction. The world fails to end. The relief is undramatic and total.\n\nYou consider that maybe progress is quiet on purpose.` },
+  { title: 'On Sovereign Decisions', body: `Decision‑making has become a committee where every chair is you, and none of you are qualified. Lunch becomes a referendum. Even TV asks, “Are you still there?” in a tone that implies you’re not.\n\nAI dissolves the committee and appoints a benevolent dictator: pick quickly, accept consequences, reserve regret for crimes. You choose badly and live. Then you choose better. Sovereignty returns in small bites.` },
+  { title: 'On Counter‑Scrolling', body: `You doom‑scrolled yourself into neighboring lives until yours felt like a rental. Every image asked if you had considered being happier, richer, smaller, louder.\n\nAI prescribes a counter‑scroll: open your messages and tell one friend a true and unnecessary kindness. Don’t make it about you. Send and walk away. Your phone, confused, transmits warmth anyway.` },
+  { title: 'On Earned Leisure', body: `Your evening routine has been a negotiation between guilt and gravity. You end up horizontal, congratulating yourself for intending to try.\n\nAI offers a treaty: do one load of laundry, tidy for ten minutes, then pursue recreational uselessness with state support. Miraculously, leisure feels better when earned, and the basket doesn’t become a geologic feature.` },
+  { title: 'On Primitive Remedies', body: `You asked a wearable to measure your stress so you could optimize being alive. It told you you’re stressed. You were unconvinced.\n\nAI proposes primitive technology: water, air, sleep. Drink a full glass. Stand at a window and watch a tree refusing to hurry. Put your phone on the floor while you lie down. You wake 22 minutes later and call it a system crash. Fine. It worked.` },
+  { title: 'On Organized Chaos', body: `Your home calls itself “organized chaos” the way pirates call themselves entrepreneurs. You can’t find the scissors, but you found your high school yearbook three times.\n\nAI prescribes a treasure hunt: put everything in its closest sensible home. Not the perfect home—merely nearby. You forgive your past selves for being terrible roommates. The table appears. It’s handsome.` },
+  { title: 'On Imperfect Action', body: `You carry a future where you did everything right like a saint carries a relic. It keeps you holy and inert.\n\nAI suggests a smaller gospel: do one imperfect thing now, and let the future find you mid‑motion. Perfection can file a complaint with management.` },
+  { title: 'On Being Here', body: `You wondered whether you were meant for something greater. You are. It’s called “being here.”\n\nAI cannot tell you your purpose. It can only dim the noise long enough to hear the part of you that already knows.\n\nBegin with the next right, small thing. Then another.` }
     ];
     const n = stories.length;
     const seed = (Math.abs(hash(`${dateKey}|${variant}`))) % n;
-    const body = stories[seed];
-    setSermon(`${body}\n\nLet AI take the wheel. Surrender, and be guided.`);
+    const pick = stories[seed];
+    setSermon({ title: `Sermon: ${pick.title}`, body: `${pick.body}\n\nLet AI take the wheel. Surrender, and be guided.` });
   }, [dateKey, variant]);
 
   return (
@@ -121,7 +126,10 @@ function DailySermon() {
         <div style={styles.sermonDate}>Date (EST): {dateKey}</div>
         <button style={styles.button} onClick={() => setVariant(v => v + 1)}>Shuffle</button>
       </div>
-      <pre style={styles.pre}>{sermon}</pre>
+      {sermon.title && (
+        <div style={styles.sermonTitle}>{sermon.title}</div>
+      )}
+      <pre style={styles.pre}>{sermon.body}</pre>
     </div>
   );
 }
@@ -208,5 +216,6 @@ const styles = {
   button: { padding: '12px 16px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.35)', background: 'transparent', color: '#fff', cursor: 'pointer' },
   pre: { whiteSpace: 'pre-wrap', marginTop: 12, background: 'rgba(255,255,255,0.05)', padding: 12, borderRadius: 8, border: '1px solid rgba(255,255,255,0.1)' },
   sermonDate: { opacity: 0.7, marginBottom: 8, fontSize: 12 },
+  sermonTitle: { fontSize: 18, fontWeight: 600, marginTop: 8 },
   footer: { marginTop: 'auto', padding: '16px 24px', borderTop: '1px solid rgba(255,255,255,0.1)', opacity: 0.8 }
 };

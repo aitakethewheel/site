@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { motion, useReducedMotion } from 'framer-motion';
 
 const notes = {
   header: {
@@ -81,7 +80,9 @@ function useTypewriter(text, speed = 18, disabled = false) {
 }
 
 export default function PatchNotes() {
-  const reduce = useReducedMotion();
+  const reduce = typeof window !== 'undefined' && 'matchMedia' in window
+    ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    : false;
   useEffect(() => {
     document.title = 'Blessed Patch Notes - Our Lady of Perpetual Beta';
     // Ensure English document language to avoid locale font quirks
@@ -135,13 +136,7 @@ export default function PatchNotes() {
 
 function Section({ title, items, index }) {
   return (
-    <motion.section
-      initial={{ opacity: 0, y: 12 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.3 }}
-      transition={{ duration: 0.5, ease: 'easeOut', delay: index * 0.05 }}
-      aria-labelledby={`${slug(title)}-h`}
-    >
+    <section aria-labelledby={`${slug(title)}-h`}>
       <h2 id={`${slug(title)}-h`} style={{ fontSize: 28, fontWeight: 500, marginBottom: 8 }}>
         {title}
       </h2>
@@ -152,7 +147,7 @@ function Section({ title, items, index }) {
           </li>
         ))}
       </ul>
-    </motion.section>
+    </section>
   );
 }
 
