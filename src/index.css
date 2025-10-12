@@ -18,3 +18,23 @@ button, input, textarea {
 }
 
 img { display: block; max-width: 100%; height: auto; }
+
+/* Layout grid: 2 columns on wide screens, single on small */
+.mainGrid {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+@media (min-width: 980px) {
+  .mainGrid {
+    grid-template-columns: 1fr 0.9fr;
+    gap: 32px;
+  }
+}
+
+.rightCol { position: relative; }
+.leftCol { min-width: 0; }

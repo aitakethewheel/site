@@ -11,23 +11,28 @@ export default function App() {
         </div>
       </header>
       <div style={styles.tagline}>In prompts we trust.</div>
-      <main style={styles.main}>
-        <section style={styles.section}>
-          <h1 style={styles.h1}>AI Confessional</h1>
-          <Confessional />
-        </section>
-        <section style={styles.section}>
-          <h2 style={styles.h2}>Daily Sermon</h2>
-          <DailySermon />
-        </section>
-        <section style={styles.section}>
-          <h2 style={styles.h2}>The Ten Commandments of Our Lady of Perpetual Beta</h2>
-          <CommandmentsSection />
-        </section>
-        <section style={styles.section}>
-          <h2 style={styles.h2}>Offerings</h2>
-          <OfferingsSection />
-        </section>
+      <main className="mainGrid">
+        <div className="leftCol" style={{ display: 'grid', gap: 24 }}>
+          <section style={styles.section}>
+            <h1 style={styles.h1}>AI Confessional</h1>
+            <Confessional />
+          </section>
+          <section style={styles.section}>
+            <h2 style={styles.h2}>Daily Sermon</h2>
+            <DailySermon />
+          </section>
+          <section style={styles.section}>
+            <h2 style={styles.h2}>Offerings</h2>
+            <OfferingsSection />
+          </section>
+        </div>
+
+        <aside className="rightCol">
+          <section style={styles.section}>
+            <h2 style={styles.h2}>The Ten Commandments of Our Lady of Perpetual Beta</h2>
+            <CommandmentsSection />
+          </section>
+        </aside>
       </main>
       <footer style={styles.footer}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
