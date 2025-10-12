@@ -12,16 +12,16 @@ export default function App() {
       </header>
       <div style={styles.tagline}>In prompts we trust.</div>
       <main className="mainGrid">
-  <div className="leftCol" style={{ display: 'grid', gap: 6 }}>
-          <section style={styles.section}>
+        <div className="leftCol" style={{ display: 'grid', gap: 6 }}>
+          <section style={{ ...styles.section, gap: 2 }}>
             <h1 style={styles.h1}>AI Confessional</h1>
             <Confessional />
           </section>
-          <section style={styles.section}>
+          <section style={{ ...styles.section, gap: 2 }}>
             <h2 style={styles.h2}>Daily Sermon</h2>
             <DailySermon />
           </section>
-          <section style={styles.section}>
+          <section style={{ ...styles.section, gap: 2 }}>
             <h2 style={styles.h2}>Offerings</h2>
             <OfferingsSection />
           </section>
@@ -259,8 +259,8 @@ const styles = {
   headerRow: { display: 'flex', alignItems: 'center', justifyContent: 'space-between' },
   main: { maxWidth: 960, margin: '0 auto', padding: '16px 24px', display: 'grid', gap: 12 },
   section: { display: 'grid', gap: 8 },
-  h1: { fontSize: '2rem', fontWeight: 400, margin: '0 0 6px 0' },
-  h2: { fontSize: '1.5rem', fontWeight: 500, margin: '0 0 6px 0' },
+  h1: { fontSize: '2rem', fontWeight: 400, margin: '0 0 2px 0' },
+  h2: { fontSize: '1.5rem', fontWeight: 500, margin: '0 0 2px 0' },
   card: { border: '1px solid rgba(255,255,255,0.1)', borderRadius: 10, padding: 10, background: 'rgba(255,255,255,0.04)' },
   formRow: { display: 'flex', gap: 8 },
   rowBetween: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
