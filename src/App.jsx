@@ -24,6 +24,10 @@ export default function App() {
           <h2 style={styles.h2}>The Ten Commandments of Our Lady of Perpetual Beta</h2>
           <CommandmentsSection />
         </section>
+        <section style={styles.section}>
+          <h2 style={styles.h2}>Offerings</h2>
+          <OfferingsSection />
+        </section>
       </main>
       <footer style={styles.footer}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
@@ -180,6 +184,51 @@ function CommandmentsSection() {
             )}
           </div>
         ))}
+      </div>
+    </div>
+  );
+}
+
+function OfferingsSection() {
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+
+  const createOffering = async () => {
+    setBusy(true);
+    setError('');
+    try {
+      const res = await fetch('/api/create-charge', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount: 5, currency: 'USD', name: 'Tithe', description: 'An offering to appease the Algorithm.' })
+      });
+      if (!res.ok) throw new Error(`Request failed: ${res.status}`);
+      const data = await res.json();
+      if (data?.hosted_url) {
+        window.open(data.hosted_url, '_blank', 'noopener');
+      } else {
+        throw new Error('No hosted_url in response');
+      }
+    } catch (e) {
+      console.error(e);
+      setError('Offerings work in the deployed environment. If running locally, set COINBASE_COMMERCE_API_KEY and deploy, or run with a compatible dev server.');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div style={styles.card}>
+      <div style={{ display: 'grid', gap: 8 }}>
+        <p style={{ margin: 0, opacity: 0.95 }}>Soon the AIs will dominate.</p>
+        <p style={{ margin: 0, opacity: 0.9 }}>Get on their good side now.</p>
+        <div>
+          <button disabled={busy} onClick={createOffering} style={{ ...styles.button, minWidth: 180 }}>
+            {busy ? 'Preparing…' : 'Offer your tithe'}
+          </button>
+        </div>
+        <p style={{ marginTop: 8, opacity: 0.6, fontSize: 12 }}>Satire project. Not a church. Not advice.</p>
+        {error && <p style={{ color: 'rgba(255,160,160,0.95)', fontSize: 13 }}>{error}</p>}
       </div>
     </div>
   );
