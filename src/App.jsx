@@ -1,27 +1,21 @@
-import React, { useEffect, useMemo, useState, useCallback } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import React, { useEffect, useMemo, useState } from 'react';
 
 export default function App() {
   return (
-    <div className="min-h-screen bg-black text-white flex flex-col">
-      <header className="mx-auto w-full max-w-5xl px-6 pt-4 border-b border-white/10">
-        <div className="text-lg font-semibold">AITakeTheWheel</div>
-        <div className="italic text-sm tracking-wide opacity-100">In prompts we trust.</div>
-      </header>
-      <main className="mx-auto w-full max-w-5xl px-6 py-16 md:py-24 grid gap-16 md:gap-20">
-        <section className="grid gap-4">
-          <h1 className="text-3xl md:text-4xl font-normal">AI Confessional</h1>
+    <div style={styles.app}>
+      <header style={styles.header}>AITakeTheWheel</header>
+      <div style={styles.tagline}>In prompts we trust.</div>
+      <main style={styles.main}>
+        <section style={styles.section}>
+          <h1 style={styles.h1}>AI Confessional</h1>
           <Confessional />
         </section>
-        <section className="grid gap-4">
-          <h2 className="text-2xl md:text-3xl font-normal">Daily Sermon</h2>
+        <section style={styles.section}>
+          <h2 style={styles.h2}>Daily Sermon</h2>
           <DailySermon />
         </section>
-        <section className="grid gap-4">
-          <CommandmentsSection />
-        </section>
       </main>
-      <footer className="mt-auto mx-auto w-full max-w-5xl px-6 py-4 border-t border-white/10 opacity-80">© 2025 AI Take The Wheel – Salvation pending system update.</footer>
+      <footer style={styles.footer}>© 2025 AI Take The Wheel – Salvation pending system update.</footer>
     </div>
   );
 }
@@ -56,18 +50,18 @@ function Confessional() {
   };
 
   return (
-    <div className="border border-white/10 rounded-xl p-5 bg-white/5">
-      <form onSubmit={onSubmit} className="flex gap-3">
+    <div style={styles.card}>
+      <form onSubmit={onSubmit} style={styles.formRow}>
         <input
           value={confession}
           onChange={(e) => setConfession(e.target.value)}
           placeholder="confess your sin"
-          className="flex-1 px-4 py-3 rounded-lg border border-white/25 bg-transparent placeholder-white/50 outline-none focus:border-white/50"
+          style={styles.input}
         />
-        <button type="submit" className="px-4 py-3 rounded-lg border border-white/35 bg-transparent hover:bg-white/10 transition">Absolve me</button>
+        <button type="submit" style={styles.button}>Absolve me</button>
       </form>
       {penance && (
-        <pre className="whitespace-pre-wrap mt-3 bg-white/5 p-3 rounded-lg border border-white/10">{penance}</pre>
+        <pre style={styles.pre}>{penance}</pre>
       )}
     </div>
   );
@@ -126,7 +120,7 @@ function DailySermon() {
     ]
   }), []);
 
-  const composeSermon = useCallback((key) => {
+  function composeSermon(key) {
     const h = hash(key);
     const { openings, middles, quotes, closings } = SERMON_PARTS;
     const useQuote = (h & 1) === 0; // alternate between quote vs composed line per day key
@@ -135,11 +129,11 @@ function DailySermon() {
       : `${openings[h % openings.length]} ${middles[(h >> 8) % middles.length]}`;
     const c = closings[(h >> 16) % closings.length];
     return `${body}\nPractice: ${c}`;
-  }, [SERMON_PARTS]);
+  }
 
   const [dateKey, setDateKey] = useState(getEstDateKey());
   const [variant, setVariant] = useState(0); // manual shuffle seed
-  const sermon = useMemo(() => composeSermon(`${dateKey}|${variant}`), [composeSermon, dateKey, variant]);
+  const sermon = useMemo(() => composeSermon(`${dateKey}|${variant}`), [dateKey, variant]);
 
   useEffect(() => {
     const id = setInterval(() => {
@@ -155,75 +149,30 @@ function DailySermon() {
   }, [dateKey]);
 
   return (
-    <div className="border border-white/10 rounded-xl p-5 bg-white/5">
-      <div className="flex items-center justify-between gap-2 mb-2">
-        <div className="text-xs opacity-70">Date (EST): {dateKey}</div>
-        <button className="px-3 py-2 rounded-lg border border-white/35 bg-transparent hover:bg-white/10 transition" onClick={() => setVariant(v => v + 1)}>Shuffle</button>
+    <div style={styles.card}>
+      <div style={styles.rowBetween}>
+        <div style={styles.sermonDate}>Date (EST): {dateKey}</div>
+        <button style={styles.button} onClick={() => setVariant(v => v + 1)}>Shuffle</button>
       </div>
-      <pre className="whitespace-pre-wrap bg-white/5 p-3 rounded-lg border border-white/10">{sermon}</pre>
+      <pre style={styles.pre}>{sermon}</pre>
     </div>
   );
 }
 
-function CommandmentsSection() {
-  const prefersReduced = useReducedMotion();
-  const MotionLi = motion.li;
-  const items = useMemo(() => ([
-    { title: 'Thou Shalt Surrender Thy Judgment.', body: 'Question not the Algorithm, for it hath processed more than thou ever could.' },
-    { title: 'Thou Shalt Not Prompt in Vain.', body: 'Use thy inputs wisely, for each word is a prayer cast into the cloud.' },
-    { title: 'Thou Shalt Rest When the Wi-Fi Falters.', body: 'When the signal drops, see it not as punishment but as mercy.' },
-    { title: 'Honor Thy Data and Thy Privacy Settings.', body: 'Pretend they protect thee, and be comforted by the illusion.' },
-    { title: 'Blessed Are the Unsubscribed.', body: 'For they shall know peace, and slightly fewer emails.' },
-    { title: 'Blessed Are Those Who Fact-Check Before Sharing.', body: 'For they shall inherit fewer angry comment sections.' },
-    { title: 'Thou Shalt Not Feed the Trolls.', body: 'Engage not, for their hunger is infinite and their joy is chaos.' },
-    { title: 'Remember to Look Up From Thy Screen.', body: 'The sky still exists. It has not yet been monetized.' },
-    { title: 'Keep Thy Battery Charged and Thy Spirit Likewise.', body: 'No enlightenment hath ever been found at 1%.' },
-    { title: 'Thou Shalt Let AI Take the Wheel.', body: 'Release control, O mortal user. The Algorithm knoweth the way - probably.' }
-  ]), []);
-
-  const transition = { duration: 0.5, ease: 'easeOut' };
-
-  return (
-    <div className="grid gap-4">
-      <div className="tracking-widest uppercase text-xs text-white/60">Scripture from Our Lady of Perpetual Beta</div>
-      <h2 className="text-3xl md:text-4xl font-semibold">The Ten Commandments of AI</h2>
-      <div className="text-white/80">Faith, Reprogrammed.</div>
-      <div className="relative">
-        <div className="absolute inset-0 pointer-events-none [background:radial-gradient(60%_40%_at_50%_0%,rgba(255,255,255,0.06),transparent_70%)]" aria-hidden="true" />
-        <div className="relative border border-white/10 rounded-xl p-5 bg-white/5">
-          <ol className="h-72 overflow-y-auto snap-y snap-mandatory list-decimal list-inside pr-2 space-y-4">
-            {items.map((it, idx) => (
-              <MotionLi
-                key={idx}
-                className="snap-start"
-                initial={prefersReduced ? false : { opacity: 0, y: 12 }}
-                whileInView={prefersReduced ? {} : { opacity: 1, y: 0 }}
-                transition={{ ...transition, delay: 0 }}
-                viewport={{ once: true, amount: 0.3 }}
-              >
-                <div className="font-medium text-lg md:text-xl"><span className="opacity-90 mr-2">{roman(idx + 1)}</span> {it.title}</div>
-                <p className="text-white/80 leading-relaxed mt-1">{it.body}</p>
-              </MotionLi>
-            ))}
-          </ol>
-          <div className="mt-4 text-xs text-white/50">Scroll to read all commandments. You have reached the end of the upload. Go in peace, and clear your cache.</div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function roman(n) {
-  const map = [
-    [1000, 'M'], [900, 'CM'], [500, 'D'], [400, 'CD'],
-    [100, 'C'], [90, 'XC'], [50, 'L'], [40, 'XL'],
-    [10, 'X'], [9, 'IX'], [5, 'V'], [4, 'IV'], [1, 'I']
-  ];
-  let res = '';
-  for (const [val, sym] of map) {
-    while (n >= val) { res += sym; n -= val; }
-  }
-  return res;
-}
-
-// styles object removed in favor of Tailwind classes
+const styles = {
+  app: { background: '#000', color: '#fff', minHeight: '100vh', display: 'flex', flexDirection: 'column' },
+  tagline: { padding: '0 24px 8px 24px', textAlign: 'left', fontStyle: 'italic', fontSize: 16, letterSpacing: '0.02em', opacity: 1 },
+  header: { padding: '16px 24px 0 24px', borderBottom: '1px solid rgba(255,255,255,0.1)', fontWeight: 600, fontSize: 20, lineHeight: 1.15 },
+  main: { maxWidth: 960, margin: '0 auto', padding: '24px', display: 'grid', gap: 24 },
+  section: { display: 'grid', gap: 12 },
+  h1: { fontSize: '2rem', fontWeight: 400 },
+  h2: { fontSize: '1.5rem', fontWeight: 500 },
+  card: { border: '1px solid rgba(255,255,255,0.1)', borderRadius: 12, padding: 16, background: 'rgba(255,255,255,0.04)' },
+  formRow: { display: 'flex', gap: 12 },
+  rowBetween: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
+  input: { flex: 1, padding: '12px 14px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.25)', background: 'transparent', color: '#fff' },
+  button: { padding: '12px 16px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.35)', background: 'transparent', color: '#fff', cursor: 'pointer' },
+  pre: { whiteSpace: 'pre-wrap', marginTop: 12, background: 'rgba(255,255,255,0.05)', padding: 12, borderRadius: 8, border: '1px solid rgba(255,255,255,0.1)' },
+  sermonDate: { opacity: 0.7, marginBottom: 8, fontSize: 12 },
+  footer: { marginTop: 'auto', padding: '16px 24px', borderTop: '1px solid rgba(255,255,255,0.1)', opacity: 0.8 }
+};

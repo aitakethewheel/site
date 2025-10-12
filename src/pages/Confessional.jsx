@@ -31,7 +31,7 @@ export default function Confessional() {
         <Link to="/devotional" className="px-4 py-2 rounded-xl bg-accent-blue text-white font-bold shadow-neon">Devotional</Link>
         <Link to="/oracle" className="px-4 py-2 rounded-xl bg-black text-white font-bold shadow-neon">Oracle</Link>
       </div>
-  <h1 className="text-2xl font-semibold mb-6 text-accent-purple">AI Confessional</h1>
+      <h1 className="text-3xl font-bold mb-4 text-accent-purple">AI Confessional</h1>
       <input
         value={input}
         onChange={e => setInput(e.target.value)}
