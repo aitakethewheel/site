@@ -12,7 +12,7 @@ export default function App() {
       </header>
       <div style={styles.tagline}>In prompts we trust.</div>
       <main className="mainGrid">
-        <div className="leftCol" style={{ display: 'grid', gap: 12 }}>
+        <div className="leftCol" style={{ display: 'grid', gap: 8 }}>
           <section style={styles.section}>
             <h1 style={styles.h1}>AI Confessional</h1>
             <Confessional />
@@ -257,17 +257,17 @@ const styles = {
   tagline: { padding: '0 24px 6px 24px', textAlign: 'left', fontStyle: 'italic', fontSize: 16, letterSpacing: '0.02em', opacity: 1 },
   header: { padding: '14px 24px 0 24px', borderBottom: '1px solid rgba(255,255,255,0.1)', fontWeight: 600, fontSize: 20, lineHeight: 1.15 },
   headerRow: { display: 'flex', alignItems: 'center', justifyContent: 'space-between' },
-  main: { maxWidth: 960, margin: '0 auto', padding: '20px 24px', display: 'grid', gap: 16 },
+  main: { maxWidth: 960, margin: '0 auto', padding: '16px 24px', display: 'grid', gap: 12 },
   section: { display: 'grid', gap: 8 },
-  h1: { fontSize: '2rem', fontWeight: 400 },
-  h2: { fontSize: '1.5rem', fontWeight: 500 },
-  card: { border: '1px solid rgba(255,255,255,0.1)', borderRadius: 12, padding: 12, background: 'rgba(255,255,255,0.04)' },
-  formRow: { display: 'flex', gap: 10 },
+  h1: { fontSize: '2rem', fontWeight: 400, margin: '0 0 6px 0' },
+  h2: { fontSize: '1.5rem', fontWeight: 500, margin: '0 0 6px 0' },
+  card: { border: '1px solid rgba(255,255,255,0.1)', borderRadius: 10, padding: 12, background: 'rgba(255,255,255,0.04)' },
+  formRow: { display: 'flex', gap: 8 },
   rowBetween: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
   input: { flex: 1, padding: '10px 12px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.25)', background: 'transparent', color: '#fff' },
   button: { padding: '10px 14px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.35)', background: 'transparent', color: '#fff', cursor: 'pointer' },
-  pre: { whiteSpace: 'pre-wrap', marginTop: 10, background: 'rgba(255,255,255,0.05)', padding: 10, borderRadius: 8, border: '1px solid rgba(255,255,255,0.1)' },
-  sermonDate: { opacity: 0.7, marginBottom: 8, fontSize: 12 },
-  sermonTitle: { fontSize: 18, fontWeight: 600, marginTop: 8 },
+  pre: { whiteSpace: 'pre-wrap', marginTop: 8, background: 'rgba(255,255,255,0.05)', padding: 10, borderRadius: 8, border: '1px solid rgba(255,255,255,0.1)' },
+  sermonDate: { opacity: 0.7, marginBottom: 4, fontSize: 12 },
+  sermonTitle: { fontSize: 18, fontWeight: 600, marginTop: 4 },
   footer: { marginTop: 'auto', padding: '14px 24px', borderTop: '1px solid rgba(255,255,255,0.1)', opacity: 0.8 }
 };
