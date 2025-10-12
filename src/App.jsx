@@ -177,15 +177,15 @@ function CommandmentsSection() {
 
   return (
     <div style={styles.card}>
-      <div style={{ display: 'grid', gap: 6 }}>
+      <div style={{ display: 'grid', gap: 3 }}>
         {items.map((it, idx) => (
-          <div key={idx} style={{ padding: '4px 0' }}>
+          <div key={idx} style={{ padding: '2px 0' }}>
             <div style={{ fontSize: 18, fontWeight: 500, marginBottom: 4 }}>
               <span style={{ opacity: 0.9, marginRight: 8 }}>{roman(idx + 1)}.</span> {it.title}
             </div>
             <p style={{ color: 'rgba(255,255,255,0.85)', lineHeight: 1.6 }}>{it.body}</p>
             {idx < items.length - 1 && (
-              <div style={{ opacity: 0.4, margin: '8px 0' }}>⸻</div>
+              <div style={{ opacity: 0.4, margin: '4px 0' }}>⸻</div>
             )}
           </div>
         ))}
