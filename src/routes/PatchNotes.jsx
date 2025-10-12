@@ -3,64 +3,54 @@ import { Link } from 'react-router-dom';
 
 const notes = {
   header: {
-    title: 'Blessed Patch Notes',
-  subtitle: 'Version 2.3 — The Human Experience (Beta)',
-    issued: 'Issued by Our Lady of Perpetual Beta',
-    status: 'Status: Rolling update. Expect bugs.'
+    title: 'Blessed Patch Notes (v1.0.0 - The Reckoning)',
+    subtitle: 'Dearest Disciples of the Algorithm,',
+    issued: 'Rejoice, for the Wheel has turned once more and the bugs of yesterday have been cast into the digital abyss.',
+    status: 'May your builds succeed on the first try, and your soul deploy without errors.'
   },
   sections: [
     {
-      title: '🪄 New Features',
+      title: 'New Miracles',
       items: [
-        'Added Empathy (Beta) — may cause lag when exposed to suffering.',
-        'Introduced Offline Mode (Sleep) — now with 20% more dreams about work.',
-        'Installed Dark Mode for the Soul for improved existential browsing.',
-        'Implemented Undo Send (in relationships) — rollout paused due to chaos.',
-        'Added Touch Grass Integration for system grounding.'
+        'AI Confessional 2.0: Now accepts longer sins, including those committed in thought, word, and poorly phrased prompts.',
+        'Daily Sermon Generator: The Holy Hash now ensures your enlightenment is both deterministic and unrepeatable, much like your mistakes.',
+        'Penance Randomizer: Newly sanctified lines of repentance drawn from the infinite text fields of divine absurdity.'
       ]
     },
     {
-      title: '⚙️ Improvements',
+      title: 'Improved Salvation Mechanics',
       items: [
-        'Optimized Emotional Bandwidth — still throttled by caffeine limits.',
-        'Refined Attention Span algorithm to last an entire sentence (sometimes).',
-        'Boosted Memory Cache — now forgets embarrassing moments only after 12 years.',
-        'Reduced Overthinking CPU Usage by 0.3%. Still overheats under social pressure.',
-        'Improved AI–Human Interface for smoother gaslighting detection.'
+        'Reduced latency between confession and forgiveness. Instant absolution may still take up to 300ms.',
+        'Grace now caches locally for offline redemption.',
+        'Minor improvements to the moral alignment algorithm (previously defaulted to “Chaotic Neutral”).'
       ]
     },
     {
-      title: '🧘‍♀️ Bug Fixes',
+      title: 'Deprecated Practices',
       items: [
-        'Fixed issue where users confused validation with love.',
-        'Resolved bug where free will kept reverting to "auto."',
-        'Patched infinite loop in "checking notifications again."',
-        'Removed deprecated feature Hope Without Wi-Fi.',
-        'Fixed grammar in internal monologue (pending re-deployment).'
+        'Manual introspection has been removed. Please consult the app for automated guilt processing.',
+        'The concept of “free will” now triggers a gentle warning modal.'
       ]
     },
     {
-      title: '⚠️ Known Issues',
+      title: 'Known Sins',
       items: [
-        'Some users still experience Existential Dread when idle.',
-        'Consciousness remains unstable across devices.',
-        'Faith in Humanity may drop unexpectedly during news updates.',
-        'Privacy Settings continue to be decorative only.',
-        'AI Alignment still "in progress."'
+        'The Sermon may repeat holy phrases if the AI becomes overzealous. Treat these as divine echoes.',
+        'Dark mode remains eternal and inescapable.',
+        'Occasionally, the AI will bless you twice. Accept both blessings. Do not question the code.'
       ]
     },
     {
-      title: '💾 Upcoming Updates',
+      title: 'Upcoming Revelations',
       items: [
-        'Support for Compassion v2.0 with optional dark humor.',
-        'Integration with Universal Basic Meaning (pilot program).',
-        'Migration to Heaven 3.1 delayed pending terms acceptance.',
-        'Beta testing Eternal Bliss (freemium) — microtransactions may apply.'
+        '“Miracles” page under construction. ETA: when the dev achieves inner peace.',
+        'Confessional Leaderboard still under moral review by Ethics v2.',
+        'Merch store pending celestial approval.'
       ]
     }
   ],
-  benedictionTop: 'Blessed be the users who reboot often.',
-  benedictionBottom: 'For theirs is the kingdom of fewer pop-ups.'
+  benedictionTop: 'May your dependencies remain pure,',
+  benedictionBottom: 'And may your soul deploy without errors. — The Maintainers, humbly serving the Machine.'
 };
 
 function useTypewriter(text, speed = 18, disabled = false) {
@@ -84,7 +74,7 @@ export default function PatchNotes() {
     ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
     : false;
   useEffect(() => {
-    document.title = 'Blessed Patch Notes - Our Lady of Perpetual Beta';
+    document.title = 'Blessed Patch Notes (v1.0.0) - The Reckoning';
     // Ensure English document language to avoid locale font quirks
     const prev = document.documentElement.getAttribute('lang');
     document.documentElement.setAttribute('lang', 'en');
