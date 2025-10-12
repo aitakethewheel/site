@@ -29,7 +29,7 @@ export default function App() {
 
         <aside className="rightCol">
           <section style={styles.section}>
-            <h2 style={styles.h2}>The Ten Commandments of Our Lady of Perpetual Beta</h2>
+            <h2 style={{ ...styles.h2, fontSize: '1.25rem', margin: '0 0 4px 0' }}>The Ten Commandments of Our Lady of Perpetual Beta</h2>
             <CommandmentsSection />
           </section>
         </aside>
@@ -177,15 +177,15 @@ function CommandmentsSection() {
 
   return (
     <div style={styles.card}>
-      <div style={{ display: 'grid', gap: 2 }}>
+      <div style={{ display: 'grid', gap: 1 }}>
         {items.map((it, idx) => (
           <div key={idx} style={{ padding: '0px 0' }}>
-            <div style={{ fontSize: 18, fontWeight: 500, marginBottom: 2 }}>
-              <span style={{ opacity: 0.9, marginRight: 8 }}>{roman(idx + 1)}.</span> {it.title}
+            <div style={{ fontSize: 16, fontWeight: 500, marginBottom: 1 }}>
+              <span style={{ opacity: 0.9, marginRight: 6 }}>{roman(idx + 1)}.</span> {it.title}
             </div>
-            <p style={{ color: 'rgba(255,255,255,0.85)', lineHeight: 1.5 }}>{it.body}</p>
+            <p style={{ color: 'rgba(255,255,255,0.85)', lineHeight: 1.4 }}>{it.body}</p>
             {idx < items.length - 1 && (
-              <div style={{ opacity: 0.4, margin: '2px 0' }}>⸻</div>
+              <div style={{ opacity: 0.4, margin: '1px 0' }}>⸻</div>
             )}
           </div>
         ))}
