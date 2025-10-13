@@ -47,81 +47,121 @@ export default function App() {
 function Confessional() {
   const [confession, setConfession] = useState('');
   const [penance, setPenance] = useState('');
-  const [queue, setQueue] = useState([]);
-  const [confDateKey, setConfDateKey] = useState(getEstDateKey());
-  const penanceStorageKey = useMemo(() => `penanceQueue-${confDateKey}`, [confDateKey]);
+  const [counter, setCounter] = useState(0);
+  const [seenHashes, setSeenHashes] = useState([]);
 
-  const penances = [
-    'Let AI write your Venmo payment descriptions for the next week. When friends ask why you paid for "Strategic Caffeine Investment" instead of "coffee," maintain eye contact and say "I\'m pivoting my vocabulary."',
-    'Ask AI to optimize your dating app bio. Use it verbatim, even if it describes you as "aggressively mediocre but with excellent Wi‑Fi." Own your truth.',
-    'Have AI choose your next three Instagram stories. Post them without context. When people ask why you shared a motivational quote about spreadsheets, tell them you\'re "disrupting your personal brand."',
-    'Let AI plan your grocery list based on "nutritional optimization." When you\'re eating quinoa salad for the third day straight, remind yourself this is what peak performance feels like.',
-    'Ask AI to write your next group chat response. Send it even if it\'s weirdly formal. When your friends roast you for saying "I concur with this dining establishment selection," double down and add "synergy."',
-    'Have AI choose your workout playlist. Exercise to whatever it picks, even if you\'re doing burpees to a 12‑minute ambient whale song. Call it "mindful fitness."',
-    'Let AI draft your next email to your boss. Send it unedited, even if it starts with "Esteemed Leadership Figure." When HR calls, explain you\'re "experimenting with radical transparency."',
-    'Ask AI to pick your outfit based on the weather and your calendar. Wear it with confidence, even if it suggests a turtleneck and shorts. Fashion is subjective; AI is eternal.',
-    'Have AI choose what you binge‑watch tonight. Commit fully, even if it\'s a 6‑hour documentary about Estonian tax policy. Tell people you\'re "expanding your intellectual portfolio."',
-    'Let AI write your next social media comment on a friend\'s post. Hit send immediately. When they ask why you responded to their vacation photo with "This demonstrates excellent resource allocation," explain that AI sees deeper truths.',
-  ];
+  const COUNTER_KEY = 'penanceCounter_v1';
+  const SEEN_KEY = 'penanceSeenHashes_v1';
+  const MAX_SEEN = 4096; // rolling window to avoid repeats for a long time
 
-  // Build a seeded daily queue so penances do not repeat within the day
+  // Load persisted state
   useEffect(() => {
-    const id = setInterval(() => {
-      const k = getEstDateKey();
-      if (k !== confDateKey) setConfDateKey(k);
-    }, 30000);
-    return () => clearInterval(id);
-  }, [confDateKey]);
+    if (typeof localStorage === 'undefined') return;
+    const c = parseInt(localStorage.getItem(COUNTER_KEY) || '0', 10);
+    setCounter(Number.isFinite(c) && c >= 0 ? c : 0);
+    try {
+      const s = JSON.parse(localStorage.getItem(SEEN_KEY) || '[]');
+      if (Array.isArray(s)) setSeenHashes(s.filter(n => Number.isFinite(n)));
+    } catch {}
+  }, []);
 
-  useEffect(() => {
-    const saved = typeof localStorage !== 'undefined' ? localStorage.getItem(penanceStorageKey) : null;
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) {
-          setQueue(parsed);
-          return;
-        }
-      } catch {}
-    }
-    // Initialize a new daily queue using a seeded shuffle
-    const order = seededShuffle(penances.length, hash(`${confDateKey}|PENANCE`));
-    setQueue(order);
-    if (typeof localStorage !== 'undefined') localStorage.setItem(penanceStorageKey, JSON.stringify(order));
-  }, [confDateKey, penanceStorageKey]);
-
-  // Keep queue in sync across tabs/windows for the same day
+  // Sync across tabs
   useEffect(() => {
     const onStorage = (e) => {
-      if (e.key === penanceStorageKey && e.newValue) {
+      if (e.key === COUNTER_KEY && e.newValue != null) {
+        const v = parseInt(e.newValue, 10);
+        if (Number.isFinite(v) && v >= 0) setCounter(v);
+      }
+      if (e.key === SEEN_KEY && e.newValue != null) {
         try {
-          const parsed = JSON.parse(e.newValue);
-          if (Array.isArray(parsed)) setQueue(parsed);
+          const s = JSON.parse(e.newValue);
+          if (Array.isArray(s)) setSeenHashes(s.filter(n => Number.isFinite(n)));
         } catch {}
       }
     };
     window.addEventListener('storage', onStorage);
     return () => window.removeEventListener('storage', onStorage);
-  }, [penanceStorageKey]);
+  }, []);
 
-  function nextPenance() {
-    let current = queue;
-    if (!current || current.length === 0) {
-      // Re-seed a fresh order when exhausted to feel endless while honoring no-repeat until exhaustion
-      current = seededShuffle(penances.length, hash(`${confDateKey}|PENANCE|R`));
+  function persist(counterVal, seenArr) {
+    if (typeof localStorage === 'undefined') return;
+    localStorage.setItem(COUNTER_KEY, String(counterVal));
+    localStorage.setItem(SEEN_KEY, JSON.stringify(seenArr));
+  }
+
+  function generatePenance(seed, confessionText) {
+    const rng = makeRng(hash(`${seed}|${confessionText || ''}|PENANCE_GEN`));
+    const pick = (arr) => arr[Math.floor(rng() * arr.length)];
+    const n = 1 + Math.floor(rng() * 3);
+    const units = ['hour', 'day', 'week'];
+    const unit = pick(units);
+    const plural = (k, u) => (k === 1 ? u : `${u}s`);
+
+    const tasks = [
+      'rewrite', 'optimize', 'audit', 'schedule', 'choose', 'compose', 'curate', 'summarize', 'storyboard', 'prioritize'
+    ];
+    const objects = [
+      'your next email', 'your grocery list', 'your calendar', 'your workout', 'your outfit', 'your playlist', 'your reading list', 'your bio', 'your budget', 'your apology'
+    ];
+    const constraints = [
+      'even if it sounds uncomfortably formal',
+      'even if it chooses chaos',
+      'even if it suggests quinoa again',
+      'even if it recommends a turtleneck and shorts',
+      'even if it picks ambient whale songs',
+      'even if the vibe is “startup HR email”',
+      'even if it feels mildly embarrassing'
+    ];
+    const rationales = [
+      'Call it an experiment.', 'Treat it as penance.', 'Consider it user testing.', 'Blame the algorithm and proceed.', 'Offer no further context.'
+    ];
+    const closers = [
+      'Own your truth.', 'Redemption is cumulative.', 'Grace prefers momentum.', 'Humility is the feature, not the bug.', 'Obedience ships faster than pride.'
+    ];
+
+    const frames = [
+      () => `Ask AI to ${pick(tasks)} ${pick(objects)}. Use it verbatim, ${pick(constraints)}. ${pick(rationales)} ${pick(closers)}`,
+      () => `Let AI ${pick(tasks)} ${pick(objects)} for the next ${n} ${plural(n, unit)}. Commit fully — ${pick(constraints)} ${pick(closers)}`,
+      () => `Consult AI about your confession${confessionText ? ` “${confessionText}”` : ''} and accept the first suggestion without edits. ${pick(rationales)} ${pick(closers)}`,
+      () => `Have AI ${pick(tasks)} ${pick(objects)} and execute it exactly, then tell one friend you are “iterating in public.” ${pick(closers)}`
+    ];
+    return pick(frames)();
+  }
+
+  function nextUniquePenance(confessionText) {
+    // Try several seeds to avoid any accidental duplicates
+    const seen = new Set(seenHashes);
+    let base = counter;
+    for (let attempt = 0; attempt < 12; attempt++) {
+      const candidate = generatePenance(base + attempt, confessionText);
+      const h = hash(candidate);
+      if (!seen.has(h)) {
+        // accept and persist
+        const newCounter = base + attempt + 1;
+        const newSeen = [...seenHashes, h].slice(-MAX_SEEN);
+        setCounter(newCounter);
+        setSeenHashes(newSeen);
+        persist(newCounter, newSeen);
+        return candidate;
+      }
     }
-    const idx = current[0] ?? 0;
-    const rest = current.slice(1);
-    setQueue(rest);
-    if (typeof localStorage !== 'undefined') localStorage.setItem(penanceStorageKey, JSON.stringify(rest));
-    return penances[idx];
+    // Fallback: append a tiny deterministic suffix to force uniqueness
+    const fallback = generatePenance(base + 99, confessionText);
+    const newCounter = base + 100;
+    const h = hash(fallback);
+    const newSeen = [...seenHashes, h].slice(-MAX_SEEN);
+    setCounter(newCounter);
+    setSeenHashes(newSeen);
+    persist(newCounter, newSeen);
+    return fallback;
   }
 
   const onSubmit = (e) => {
     e.preventDefault();
     const trimmed = confession.trim();
     const headline = trimmed ? `Confession: ${trimmed}` : 'Confession received.';
-    setPenance(`${headline}\nPenance: ${nextPenance()}`);
+    const body = nextUniquePenance(trimmed);
+    setPenance(`${headline}\nPenance: ${body}`);
   };
 
   return (
