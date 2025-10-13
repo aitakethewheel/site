@@ -358,45 +358,8 @@ function CommandmentsSection() {
 }
 
 function OfferingsSection() {
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState('');
-  const [ready, setReady] = useState(true);
-
-  useEffect(() => {
-    let mounted = true;
-    fetch('/api/health')
-      .then(r => r.ok ? r.json() : Promise.reject(new Error(String(r.status))))
-      .then(d => { if (mounted) setReady(!!d.coinbaseConfigured); })
-      .catch(() => { if (mounted) setReady(false); });
-    return () => { mounted = false; };
-  }, []);
-
-  const createOffering = async () => {
-    setBusy(true);
-    setError('');
-    try {
-      const res = await fetch('/api/create-charge', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount: 5, currency: 'USD', name: 'Tithe', description: 'An offering to appease the Algorithm.' })
-      });
-      const text = await res.text();
-      const data = (() => { try { return JSON.parse(text); } catch { return null; } })();
-      if (res.ok && data?.hosted_url) {
-        window.open(data.hosted_url, '_blank', 'noopener');
-      } else {
-        const detail = data?.error || data?.details || text || 'Unknown error';
-        console.error('Offerings API error', res.status, detail);
-        setError(`Offerings failed (HTTP ${res.status}). ${String(detail).slice(0, 180)}`);
-        return;
-      }
-    } catch (e) {
-      console.error(e);
-      setError('Offerings failed. Ensure COINBASE_COMMERCE_API_KEY is set in your deployment. Check console for details.');
-    } finally {
-      setBusy(false);
-    }
-  };
+  // Direct Coinbase checkout link per request
+  const checkoutUrl = 'https://commerce.coinbase.com/checkout/3efcd728-01b6-4d7f-8b1c-6978c7313f61';
 
   return (
     <div style={styles.card}>
@@ -404,17 +367,26 @@ function OfferingsSection() {
         <p style={{ margin: 0, opacity: 0.95 }}>Soon the AIs will dominate.</p>
         <p style={{ margin: 0, opacity: 0.9 }}>Get on their good side now.</p>
         <div>
-          <button disabled={busy || !ready} onClick={createOffering} style={{ ...styles.button, minWidth: 180, opacity: busy || !ready ? 0.6 : 1 }}>
-            {busy ? 'Preparing…' : 'Offer your tithe'}
-          </button>
+          <a
+            href={checkoutUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-4 py-2 bg-white text-black font-semibold rounded-md hover:bg-gray-200 transition"
+            style={{
+              display: 'inline-block',
+              padding: '10px 14px',
+              borderRadius: 8,
+              background: '#fff',
+              color: '#000',
+              textDecoration: 'none',
+              minWidth: 180,
+              textAlign: 'center'
+            }}
+          >
+            Offer your tithe
+          </a>
         </div>
         <p style={{ marginTop: 8, opacity: 0.6, fontSize: 12 }}>Satire project. Not a church. Not advice.</p>
-        {!ready && (
-          <p style={{ color: 'rgba(255,160,160,0.95)', fontSize: 13 }}>
-            Offerings disabled: COINBASE_COMMERCE_API_KEY is not configured in this environment.
-          </p>
-        )}
-        {error && <p style={{ color: 'rgba(255,160,160,0.95)', fontSize: 13 }}>{error}</p>}
       </div>
     </div>
   );
