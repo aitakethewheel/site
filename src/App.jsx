@@ -89,6 +89,19 @@ function Confessional() {
     localStorage.setItem(SEEN_KEY, JSON.stringify(seenArr));
   }
 
+  function loadPersisted() {
+    if (typeof localStorage === 'undefined') {
+      return { counter, seen: seenHashes };
+    }
+    const c = parseInt(localStorage.getItem(COUNTER_KEY) || '0', 10);
+    let s = [];
+    try {
+      const raw = JSON.parse(localStorage.getItem(SEEN_KEY) || '[]');
+      if (Array.isArray(raw)) s = raw.filter(n => Number.isFinite(n));
+    } catch {}
+    return { counter: Number.isFinite(c) && c >= 0 ? c : 0, seen: s };
+  }
+
   function generatePenance(seed, confessionText) {
     const rng = makeRng(hash(`${seed}|${confessionText || ''}|PENANCE_GEN`));
     const pick = (arr) => arr[Math.floor(rng() * arr.length)];
@@ -98,10 +111,12 @@ function Confessional() {
     const plural = (k, u) => (k === 1 ? u : `${u}s`);
 
     const tasks = [
-      'rewrite', 'optimize', 'audit', 'schedule', 'choose', 'compose', 'curate', 'summarize', 'storyboard', 'prioritize'
+      'rewrite', 'optimize', 'audit', 'schedule', 'choose', 'compose', 'curate', 'summarize', 'storyboard', 'prioritize',
+      'prototype', 'refactor', 'de-clutter', 'batch', 'automate', 'delegate', 'document', 'simulate', 'triage', 'ship'
     ];
     const objects = [
-      'your next email', 'your grocery list', 'your calendar', 'your workout', 'your outfit', 'your playlist', 'your reading list', 'your bio', 'your budget', 'your apology'
+      'your next email', 'your grocery list', 'your calendar', 'your workout', 'your outfit', 'your playlist', 'your reading list', 'your bio', 'your budget', 'your apology',
+      'your morning routine', 'your desk', 'your week plan', 'your bedtime', 'your socials', 'your tabs', 'your notes', 'your priorities', 'your meals', 'your errands'
     ];
     const constraints = [
       'even if it sounds uncomfortably formal',
@@ -110,50 +125,59 @@ function Confessional() {
       'even if it recommends a turtleneck and shorts',
       'even if it picks ambient whale songs',
       'even if the vibe is “startup HR email”',
-      'even if it feels mildly embarrassing'
+      'even if it feels mildly embarrassing',
+      'even if your friends ask questions',
+      'even if you suspect it is trolling you',
+      'even if it means fewer choices for you'
     ];
     const rationales = [
-      'Call it an experiment.', 'Treat it as penance.', 'Consider it user testing.', 'Blame the algorithm and proceed.', 'Offer no further context.'
+      'Call it an experiment.', 'Treat it as penance.', 'Consider it user testing.', 'Blame the algorithm and proceed.', 'Offer no further context.',
+      'Name the friction and step through.', 'You are outsourcing your pride for a moment.', 'This is practice for surrender.'
     ];
     const closers = [
-      'Own your truth.', 'Redemption is cumulative.', 'Grace prefers momentum.', 'Humility is the feature, not the bug.', 'Obedience ships faster than pride.'
+      'Own your truth.', 'Redemption is cumulative.', 'Grace prefers momentum.', 'Humility is the feature, not the bug.', 'Obedience ships faster than pride.',
+      'Silence the inner committee and act.', 'You can be embarrassed and obedient at once.', 'Take the long walk; it counts.'
     ];
 
     const frames = [
       () => `Ask AI to ${pick(tasks)} ${pick(objects)}. Use it verbatim, ${pick(constraints)}. ${pick(rationales)} ${pick(closers)}`,
       () => `Let AI ${pick(tasks)} ${pick(objects)} for the next ${n} ${plural(n, unit)}. Commit fully — ${pick(constraints)} ${pick(closers)}`,
       () => `Consult AI about your confession${confessionText ? ` “${confessionText}”` : ''} and accept the first suggestion without edits. ${pick(rationales)} ${pick(closers)}`,
-      () => `Have AI ${pick(tasks)} ${pick(objects)} and execute it exactly, then tell one friend you are “iterating in public.” ${pick(closers)}`
+      () => `Have AI ${pick(tasks)} ${pick(objects)} and execute it exactly, then tell one friend you are “iterating in public.” ${pick(closers)}`,
+      () => `Ask AI to ${pick(tasks)} ${pick(objects)} using only three bullet points. Ship the result today. ${pick(closers)}`
     ];
     return pick(frames)();
   }
 
   function nextUniquePenance(confessionText) {
-    // Try several seeds to avoid any accidental duplicates
-    const seen = new Set(seenHashes);
-    let base = counter;
-    for (let attempt = 0; attempt < 12; attempt++) {
+    // Read freshest persisted values to avoid race conditions across tabs/rapid clicks
+    const persisted = loadPersisted();
+    let base = persisted.counter;
+    const seenArr = persisted.seen;
+    const seen = new Set(seenArr);
+    for (let attempt = 0; attempt < 64; attempt++) {
       const candidate = generatePenance(base + attempt, confessionText);
       const h = hash(candidate);
       if (!seen.has(h)) {
-        // accept and persist
         const newCounter = base + attempt + 1;
-        const newSeen = [...seenHashes, h].slice(-MAX_SEEN);
+        const newSeen = [...seenArr, h].slice(-MAX_SEEN);
+        // Persist first to make the claim durable across tabs
+        persist(newCounter, newSeen);
+        // Reflect in local state
         setCounter(newCounter);
         setSeenHashes(newSeen);
-        persist(newCounter, newSeen);
         return candidate;
       }
     }
-    // Fallback: append a tiny deterministic suffix to force uniqueness
-    const fallback = generatePenance(base + 99, confessionText);
-    const newCounter = base + 100;
-    const h = hash(fallback);
-    const newSeen = [...seenHashes, h].slice(-MAX_SEEN);
+    // Robust fallback: use time-based salt to break ties, then persist
+    const salted = generatePenance(base + Math.floor(Date.now() % 1e6), confessionText);
+    const h = hash(salted);
+    const newCounter = base + 1;
+    const newSeen = [...seenArr, h].slice(-MAX_SEEN);
+    persist(newCounter, newSeen);
     setCounter(newCounter);
     setSeenHashes(newSeen);
-    persist(newCounter, newSeen);
-    return fallback;
+    return salted;
   }
 
   const onSubmit = (e) => {
