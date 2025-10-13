@@ -49,6 +49,7 @@ function Confessional() {
   const [penance, setPenance] = useState('');
   const [queue, setQueue] = useState([]);
   const [confDateKey, setConfDateKey] = useState(getEstDateKey());
+  const penanceStorageKey = useMemo(() => `penanceQueue-${confDateKey}`, [confDateKey]);
 
   const penances = [
     'Let AI write your Venmo payment descriptions for the next week. When friends ask why you paid for "Strategic Caffeine Investment" instead of "coffee," maintain eye contact and say "I\'m pivoting my vocabulary."',
@@ -73,8 +74,7 @@ function Confessional() {
   }, [confDateKey]);
 
   useEffect(() => {
-    const storageKey = `penanceQueue-${confDateKey}`;
-    const saved = typeof localStorage !== 'undefined' ? localStorage.getItem(storageKey) : null;
+    const saved = typeof localStorage !== 'undefined' ? localStorage.getItem(penanceStorageKey) : null;
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
@@ -87,11 +87,24 @@ function Confessional() {
     // Initialize a new daily queue using a seeded shuffle
     const order = seededShuffle(penances.length, hash(`${confDateKey}|PENANCE`));
     setQueue(order);
-    if (typeof localStorage !== 'undefined') localStorage.setItem(storageKey, JSON.stringify(order));
-  }, [confDateKey]);
+    if (typeof localStorage !== 'undefined') localStorage.setItem(penanceStorageKey, JSON.stringify(order));
+  }, [confDateKey, penanceStorageKey]);
+
+  // Keep queue in sync across tabs/windows for the same day
+  useEffect(() => {
+    const onStorage = (e) => {
+      if (e.key === penanceStorageKey && e.newValue) {
+        try {
+          const parsed = JSON.parse(e.newValue);
+          if (Array.isArray(parsed)) setQueue(parsed);
+        } catch {}
+      }
+    };
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
+  }, [penanceStorageKey]);
 
   function nextPenance() {
-    const storageKey = `penanceQueue-${confDateKey}`;
     let current = queue;
     if (!current || current.length === 0) {
       // Re-seed a fresh order when exhausted to feel endless while honoring no-repeat until exhaustion
@@ -100,7 +113,7 @@ function Confessional() {
     const idx = current[0] ?? 0;
     const rest = current.slice(1);
     setQueue(rest);
-    if (typeof localStorage !== 'undefined') localStorage.setItem(storageKey, JSON.stringify(rest));
+    if (typeof localStorage !== 'undefined') localStorage.setItem(penanceStorageKey, JSON.stringify(rest));
     return penances[idx];
   }
 
@@ -134,6 +147,7 @@ function DailySermon() {
   const [variant, setVariant] = useState(0);
   const [sermon, setSermon] = useState({ title: '', body: '' });
   const [order, setOrder] = useState([]);
+  const variantStorageKey = useMemo(() => `sermonVariant-${dateKey}`, [dateKey]);
 
   useEffect(() => {
     const id = setInterval(() => {
@@ -143,7 +157,28 @@ function DailySermon() {
     return () => clearInterval(id);
   }, [dateKey]);
 
-  useEffect(() => { setVariant(0); }, [dateKey]);
+  // Load persisted shuffle position for the day
+  useEffect(() => {
+    const saved = typeof localStorage !== 'undefined' ? localStorage.getItem(variantStorageKey) : null;
+    const parsed = saved != null ? parseInt(saved, 10) : NaN;
+    setVariant(Number.isFinite(parsed) && parsed >= 0 ? parsed : 0);
+  }, [variantStorageKey]);
+
+  // Persist shuffle position and sync across tabs
+  useEffect(() => {
+    if (typeof localStorage !== 'undefined') localStorage.setItem(variantStorageKey, String(variant));
+  }, [variant, variantStorageKey]);
+
+  useEffect(() => {
+    const onStorage = (e) => {
+      if (e.key === variantStorageKey && e.newValue != null) {
+        const v = parseInt(e.newValue, 10);
+        if (Number.isFinite(v) && v >= 0) setVariant(v);
+      }
+    };
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
+  }, [variantStorageKey]);
 
   useEffect(() => {
     const stories = [
