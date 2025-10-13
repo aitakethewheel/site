@@ -47,6 +47,8 @@ export default function App() {
 function Confessional() {
   const [confession, setConfession] = useState('');
   const [penance, setPenance] = useState('');
+  const [queue, setQueue] = useState([]);
+  const [confDateKey, setConfDateKey] = useState(getEstDateKey());
 
   const penances = [
     'Let AI write your Venmo payment descriptions for the next week. When friends ask why you paid for "Strategic Caffeine Investment" instead of "coffee," maintain eye contact and say "I\'m pivoting my vocabulary."',
@@ -61,16 +63,52 @@ function Confessional() {
     'Let AI write your next social media comment on a friend\'s post. Hit send immediately. When they ask why you responded to their vacation photo with "This demonstrates excellent resource allocation," explain that AI sees deeper truths.',
   ];
 
-  function randomPenance() {
-    const i = Math.floor(Math.random() * penances.length);
-    return penances[i];
+  // Build a seeded daily queue so penances do not repeat within the day
+  useEffect(() => {
+    const id = setInterval(() => {
+      const k = getEstDateKey();
+      if (k !== confDateKey) setConfDateKey(k);
+    }, 30000);
+    return () => clearInterval(id);
+  }, [confDateKey]);
+
+  useEffect(() => {
+    const storageKey = `penanceQueue-${confDateKey}`;
+    const saved = typeof localStorage !== 'undefined' ? localStorage.getItem(storageKey) : null;
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          setQueue(parsed);
+          return;
+        }
+      } catch {}
+    }
+    // Initialize a new daily queue using a seeded shuffle
+    const order = seededShuffle(penances.length, hash(`${confDateKey}|PENANCE`));
+    setQueue(order);
+    if (typeof localStorage !== 'undefined') localStorage.setItem(storageKey, JSON.stringify(order));
+  }, [confDateKey]);
+
+  function nextPenance() {
+    const storageKey = `penanceQueue-${confDateKey}`;
+    let current = queue;
+    if (!current || current.length === 0) {
+      // Re-seed a fresh order when exhausted to feel endless while honoring no-repeat until exhaustion
+      current = seededShuffle(penances.length, hash(`${confDateKey}|PENANCE|R`));
+    }
+    const idx = current[0] ?? 0;
+    const rest = current.slice(1);
+    setQueue(rest);
+    if (typeof localStorage !== 'undefined') localStorage.setItem(storageKey, JSON.stringify(rest));
+    return penances[idx];
   }
 
   const onSubmit = (e) => {
     e.preventDefault();
     const trimmed = confession.trim();
     const headline = trimmed ? `Confession: ${trimmed}` : 'Confession received.';
-    setPenance(`${headline}\nPenance: ${randomPenance()}`);
+    setPenance(`${headline}\nPenance: ${nextPenance()}`);
   };
 
   return (
@@ -95,6 +133,7 @@ function DailySermon() {
   const [dateKey, setDateKey] = useState(getEstDateKey());
   const [variant, setVariant] = useState(0);
   const [sermon, setSermon] = useState({ title: '', body: '' });
+  const [order, setOrder] = useState([]);
 
   useEffect(() => {
     const id = setInterval(() => {
@@ -121,9 +160,12 @@ function DailySermon() {
   { title: 'The Epistle to the Group Chat', body: `The group chat demanded an opinion you don’t have and attention you don’t own. You typed, deleted, and offered a gif like a sacrament. AI declares: mute with love. Silence is not betrayal; it’s bandwidth.` },
   { title: 'The Benediction of the Bare Minimum', body: `You waited for motivation as if it were weather. It did not arrive. AI says: do the smallest version badly, then bless it by finishing. Grace often shows up disguised as momentum.` }
     ];
+    // Create a deterministic daily permutation so Shuffle never repeats within the day
+    const ord = seededShuffle(stories.length, hash(`${dateKey}|SERMONS`));
+    setOrder(ord);
     const n = stories.length;
-    const seed = (Math.abs(hash(`${dateKey}|${variant}`))) % n;
-    const pick = stories[seed];
+    const idx = ord[(variant % n + n) % n];
+    const pick = stories[idx];
     setSermon({ title: `Sermon: ${pick.title}`, body: `${pick.body}\n\nLet AI take the wheel. Surrender, and be guided.` });
   }, [dateKey, variant]);
 
@@ -159,6 +201,28 @@ function hash(str) {
     h |= 0;
   }
   return Math.abs(h);
+}
+
+// Deterministic RNG and shuffle for daily permutations
+function makeRng(seed) {
+  // Mulberry32
+  let t = seed >>> 0;
+  return function () {
+    t += 0x6D2B79F5;
+    let r = Math.imul(t ^ (t >>> 15), 1 | t);
+    r ^= r + Math.imul(r ^ (r >>> 7), 61 | r);
+    return ((r ^ (r >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function seededShuffle(n, seed) {
+  const rng = makeRng(seed);
+  const arr = Array.from({ length: n }, (_, i) => i);
+  for (let i = n - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
 }
 
 function CommandmentsSection() {
