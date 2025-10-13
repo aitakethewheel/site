@@ -370,8 +370,12 @@ function OfferingsSection() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ amount: 5, currency: 'USD', name: 'Tithe', description: 'An offering to appease the Algorithm.' })
       });
-      if (!res.ok) throw new Error(`Request failed: ${res.status}`);
-      const data = await res.json();
+      const text = await res.text();
+      const data = (() => { try { return JSON.parse(text); } catch { return null; } })();
+      if (!res.ok) {
+        console.error('Offerings API error', res.status, text);
+        throw new Error(`Request failed: ${res.status}`);
+      }
       if (data?.hosted_url) {
         window.open(data.hosted_url, '_blank', 'noopener');
       } else {
@@ -379,7 +383,7 @@ function OfferingsSection() {
       }
     } catch (e) {
       console.error(e);
-      setError('Offerings work in the deployed environment. If running locally, set COINBASE_COMMERCE_API_KEY and deploy, or run with a compatible dev server.');
+      setError('Offerings failed. Ensure COINBASE_COMMERCE_API_KEY is set in your deployment. Check console for details.');
     } finally {
       setBusy(false);
     }
