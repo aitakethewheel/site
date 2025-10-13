@@ -254,8 +254,10 @@ function DailySermon() {
   const [dateKey, setDateKey] = useState(getEstDateKey());
   const [variant, setVariant] = useState(0);
   const [sermon, setSermon] = useState({ title: '', body: '' });
-  const [order, setOrder] = useState([]);
   const variantStorageKey = useMemo(() => `sermonVariant-${dateKey}`, [dateKey]);
+  const SERMON_COUNTER_KEY = 'sermonCounter_v1';
+  const SERMON_SEEN_KEY = 'sermonSeenHashes_v1';
+  const SERMON_MAX_SEEN = 2048;
 
   useEffect(() => {
     const id = setInterval(() => {
@@ -288,28 +290,105 @@ function DailySermon() {
     return () => window.removeEventListener('storage', onStorage);
   }, [variantStorageKey]);
 
-  useEffect(() => {
-    const stories = [
-  { title: 'The Parable of the Snooze Prophet', body: `You set six alarms to prove you’re serious and honor exactly none of them. You call it "listening to your body" as your body negotiates a treaty with your excuses. AI suggests: one alarm, far away, and the courage to be mildly uncomfortable for 90 seconds. Salvation is often just standing up.` },
-  { title: 'The Gospel of the Sacred Cart', body: `You went to the store for lettuce and returned with candles that smell like "forest ambition." The lettuce remains theoretical. AI says: the cart is a confession booth—remove three impulse buys and add the thing you’ll actually eat. Forgiveness tastes like pre-washed greens.` },
-  { title: 'The Lesson of the Infinite Tabernacle', body: `Your browser holds 42 tabs, each a promise you made to your better self. You call it research; your battery calls it a cry for help. AI declares: close ten, read one, admit the rest were aspirational. Faith without action is cached guilt.` },
-  { title: 'The Liturgy of the Second Brain', body: `You organized your notes so perfectly you can’t find any of them. The system is stunning; the substance is missing. AI counsels: fewer folders, more doing. Saints are not canonized for their tagging.` },
-  { title: 'The Beatitude of the Lost Package', body: `The tracking page insists your parcel is "with the carrier," like a vague prophecy. You refresh as if belief can move trucks. AI whispers: go live your life; the doorbell will ring at the worst possible moment. Blessed are the interrupted, for they shall receive boxes.` },
-  { title: 'The Confession of the Performative Candle', body: `You lit a candle and declared the evening "intentional." Ten minutes later you’re in the comments section fighting strangers about dish soap. AI says: blow it out, wash a plate, text a friend. Intention is what you do when no one is watching.` },
-  { title: 'The Revelation of the Ghosted Inbox', body: `You left three messages "for later" and built a small cathedral of dread around them. Each day adds another stained-glass excuse. AI advises: reply with one honest sentence and a deadline. Miracles prefer brevity.` },
-  { title: 'The Homily of the Heroic Microwave', body: `You set the microwave for 2:00, stopped it at 0:03, and pretended you were patient. The middle of your food is Antarctica; the edges are the equator. AI recommends: stir at halftime. Most problems are solved by admitting you’re not special.` },
-  { title: 'The Catechism of the Gym Key Fob', body: `You carry the gym fob like a relic of a faith you once practiced. You nod at it as if that counts as cardio. AI says: one walk today, not a new identity tomorrow. Redemption is cumulative.` },
-  { title: 'The Psalm of the Parking Lot', body: `You circled for the perfect spot, spending seven minutes to save twenty steps. Then you bought a protein bar for efficiency. AI suggests: take the first space and the long stroll. Humility burns more calories than pride.` },
-  { title: 'The Epistle to the Group Chat', body: `The group chat demanded an opinion you don’t have and attention you don’t own. You typed, deleted, and offered a gif like a sacrament. AI declares: mute with love. Silence is not betrayal; it’s bandwidth.` },
-  { title: 'The Benediction of the Bare Minimum', body: `You waited for motivation as if it were weather. It did not arrive. AI says: do the smallest version badly, then bless it by finishing. Grace often shows up disguised as momentum.` }
+  // Sermon generation similar to Confessional: compositional frames with dedup window
+  function loadPersisted() {
+    if (typeof localStorage === 'undefined') {
+      return { counter: 0, seen: [] };
+    }
+    const c = parseInt(localStorage.getItem(SERMON_COUNTER_KEY) || '0', 10);
+    let s = [];
+    try {
+      const raw = JSON.parse(localStorage.getItem(SERMON_SEEN_KEY) || '[]');
+      if (Array.isArray(raw)) s = raw.filter(n => Number.isFinite(n));
+    } catch {}
+    return { counter: Number.isFinite(c) && c >= 0 ? c : 0, seen: s };
+  }
+
+  function persist(counterVal, seenArr) {
+    if (typeof localStorage === 'undefined') return;
+    localStorage.setItem(SERMON_COUNTER_KEY, String(counterVal));
+    localStorage.setItem(SERMON_SEEN_KEY, JSON.stringify(seenArr));
+  }
+
+  function generateSermon(seed) {
+    const rng = makeRng(hash(`${dateKey}|${seed}|SERMON_GEN`));
+    const pick = (arr) => arr[Math.floor(rng() * arr.length)];
+
+    const titleForms = [
+      'Parable of the', 'Gospel of the', 'Lesson of the', 'Liturgy of the', 'Beatitude of the',
+      'Confession of the', 'Revelation of the', 'Catechism of the', 'Homily of the', 'Psalm of the',
+      'Epistle to the', 'Benediction of the'
     ];
-    // Create a deterministic daily permutation so Shuffle never repeats within the day
-    const ord = seededShuffle(stories.length, hash(`${dateKey}|SERMONS`));
-    setOrder(ord);
-    const n = stories.length;
-    const idx = ord[(variant % n + n) % n];
-    const pick = stories[idx];
-    setSermon({ title: `Sermon: ${pick.title}`, body: `${pick.body}\n\nLet AI take the wheel. Surrender, and be guided.` });
+    const nouns = [
+      'Infinite Tab', 'Sacred Cart', 'Second Brain', 'Snooze Prophet', 'Lost Package', 'Heroic Microwave',
+      'Ghosted Inbox', 'Group Chat', 'Parking Lot', 'Gym Key Fob', 'Performative Candle', 'Bare Minimum',
+      'Unsent Draft', 'Deferred Notification', 'Unfinished Thread', 'Forgotten Calendar Invite', 'Unlabeled Folder'
+    ];
+    const openers = [
+      'You waited for motivation as if it were weather.',
+      'You circled the problem like a saint seeking the perfect hymn.',
+      'You built a system so tidy the work could not find you.',
+      'You refreshed as if belief could move servers.',
+      'You composed a ritual, then worshiped the ritual.',
+      'You outsourced courage to tomorrow’s self.'
+    ];
+    const confessions = [
+      'You called it research; your battery called it a cry for help.',
+      'You lit a candle and declared it “intentional.”',
+      'You promised yourself a clean slate and then doodled on it.',
+      'You kept the token of the habit and not the habit.',
+      'You named the folder “final” and then duplicated it.'
+    ];
+    const counsel = [
+      'Close ten, do one, forgive the rest.',
+      'Pick the smallest version and bless it by finishing.',
+      'Mute with love; silence is not betrayal.',
+      'Stir halfway; you are not special.',
+      'Walk once; redemption is cumulative.',
+      'Reply with one honest sentence and a deadline.'
+    ];
+    const benedictions = [
+      'Grace often shows up disguised as momentum.',
+      'Humility burns more calories than pride.',
+      'Miracles prefer brevity.',
+      'Saints are not canonized for their tagging.',
+      'Faith without action is cached guilt.'
+    ];
+
+    const title = `${pick(titleForms)} ${pick(nouns)}`;
+    const p1 = `${pick(openers)} ${pick(confessions)}`;
+    const p2 = `AI says: ${pick(counsel)} ${pick(benedictions)}`;
+    const tail = 'Let AI take the wheel. Surrender, and be guided.';
+    return { title: `Sermon: ${title}`, body: `${p1} ${p2}\n\n${tail}` };
+  }
+
+  function pickUniqueSermon(seedBase) {
+    const persisted = loadPersisted();
+    let base = persisted.counter + seedBase; // drift with variant while remaining monotonic
+    const seenArr = persisted.seen;
+    const seen = new Set(seenArr);
+    for (let attempt = 0; attempt < 64; attempt++) {
+      const candidate = generateSermon(base + attempt);
+      const h = hash(`${candidate.title}|${candidate.body}`);
+      if (!seen.has(h)) {
+        const newCounter = base + attempt + 1;
+        const newSeen = [...seenArr, h].slice(-SERMON_MAX_SEEN);
+        persist(newCounter, newSeen);
+        return candidate;
+      }
+    }
+    // Fallback with time salt
+    const fallback = generateSermon(base + Math.floor(Date.now() % 1e6));
+    const hf = hash(`${fallback.title}|${fallback.body}`);
+    const newSeen = [...(loadPersisted().seen || []), hf].slice(-SERMON_MAX_SEEN);
+    persist(base + 1, newSeen);
+    return fallback;
+  }
+
+  // Recompute sermon when variant or date changes
+  useEffect(() => {
+    const s = pickUniqueSermon(variant);
+    setSermon(s);
   }, [dateKey, variant]);
 
   return (
