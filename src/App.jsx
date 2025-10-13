@@ -112,7 +112,7 @@ function Confessional() {
 
     const tasks = [
       'rewrite', 'optimize', 'audit', 'schedule', 'choose', 'compose', 'curate', 'summarize', 'storyboard', 'prioritize',
-      'prototype', 'refactor', 'de-clutter', 'batch', 'automate', 'delegate', 'document', 'simulate', 'triage', 'ship'
+      'prototype', 'refactor', 'de‑clutter', 'batch', 'automate', 'delegate', 'document', 'simulate', 'triage', 'ship'
     ];
     const objects = [
       'your next email', 'your grocery list', 'your calendar', 'your workout', 'your outfit', 'your playlist', 'your reading list', 'your bio', 'your budget', 'your apology',
@@ -139,13 +139,57 @@ function Confessional() {
       'Silence the inner committee and act.', 'You can be embarrassed and obedient at once.', 'Take the long walk; it counts.'
     ];
 
-    const frames = [
-      () => `Ask AI to ${pick(tasks)} ${pick(objects)}. Use it verbatim, ${pick(constraints)}. ${pick(rationales)} ${pick(closers)}`,
-      () => `Let AI ${pick(tasks)} ${pick(objects)} for the next ${n} ${plural(n, unit)}. Commit fully — ${pick(constraints)} ${pick(closers)}`,
-      () => `Consult AI about your confession${confessionText ? ` “${confessionText}”` : ''} and accept the first suggestion without edits. ${pick(rationales)} ${pick(closers)}`,
-      () => `Have AI ${pick(tasks)} ${pick(objects)} and execute it exactly, then tell one friend you are “iterating in public.” ${pick(closers)}`,
-      () => `Ask AI to ${pick(tasks)} ${pick(objects)} using only three bullet points. Ship the result today. ${pick(closers)}`
+    const openers = ['Ask AI to', 'Let AI', 'Have AI', 'Consult AI to', 'Command AI to', 'Invite AI to', 'Request the Algorithm to', 'Enlist AI to'];
+    const enforce = [
+      'Use it verbatim', 'Execute it exactly', 'Apply it without edits', 'Follow it as written', 'No backspacing', 'Ship the first draft'
     ];
+    const publics = [
+      'then tell one friend you are “iterating in public.”', 'share it once in public.', 'treat it as v0.1 and ship today.'
+    ];
+    const joiner = () => pick(['. ', '. ', ' — ', '; ']);
+
+    const oneDistinct = () => pick(objects);
+    const multiDistinct = (k) => {
+      const pool = [...objects];
+      const res = [];
+      for (let i = 0; i < k && pool.length; i++) {
+        const j = Math.floor(rng() * pool.length);
+        res.push(pool.splice(j, 1)[0]);
+      }
+      return res;
+    };
+
+    const quote = (s) => `“${s}”`;
+    const maybe = (prob, txt) => (rng() < prob ? txt : '');
+
+    // Build many structure variants; random toggles inside each make them effectively endless.
+    const frames = [
+      () => `${pick(openers)} ${pick(tasks)} ${oneDistinct()}. ${enforce[ Math.floor(rng()*enforce.length) ]}, ${pick(constraints)}${joiner()}${pick(rationales)} ${pick(closers)}`,
+      () => `${pick(openers)} ${pick(tasks)} ${oneDistinct()} for the next ${n} ${plural(n, unit)}.${joiner()}Commit fully — ${pick(constraints)} ${pick(closers)}`,
+      () => `Consult AI about your confession${confessionText ? ` ${quote(confessionText)}` : ''} and accept the first suggestion without edits.${joiner()}${pick(rationales)} ${pick(closers)}`,
+      () => `Have AI ${pick(tasks)} ${oneDistinct()} and execute it exactly, ${pick(publics)} ${pick(closers)}`,
+      () => `${pick(openers)} ${pick(tasks)} ${oneDistinct()} using only three bullet points.${joiner()}Ship the result today. ${pick(closers)}`,
+      () => `Command AI to ${pick(tasks)} ${oneDistinct()}. No backspacing.${joiner()}${pick(rationales)} ${pick(closers)}`,
+      () => `Enlist AI to ${pick(tasks)} ${oneDistinct()}; schedule it for ${n} ${plural(n, unit)}.${joiner()}${pick(constraints)} ${pick(closers)}`,
+      () => `Let the Algorithm ${pick(tasks)} ${oneDistinct()} while you breathe for ten seconds.${joiner()}Then press send. ${pick(closers)}`,
+      () => {
+        const [a,b,c] = multiDistinct(3);
+        return `Delegate to AI: ${pick(tasks)} ${a}, ${pick(tasks)} ${b} and ${pick(tasks)} ${c}.${joiner()}Choose the first draft. ${pick(closers)}`;
+      },
+      () => `Ask AI for a one‑commit fix to ${oneDistinct()}. Apply it without refactoring.${joiner()}${pick(rationales)} ${pick(closers)}`,
+      () => `Have AI ${pick(tasks)} ${oneDistinct()}; promise to keep the weirdest line.${joiner()}${pick(constraints)} ${pick(closers)}`,
+      () => `Consult AI, then delete one step. Do the rest exactly.${joiner()}${pick(closers)}`,
+      () => `Request a minimum viable ${oneDistinct().replace('your ', '')} from AI.${joiner()}Use it in public once. ${pick(closers)}`,
+      () => `Ask AI to write a two‑sentence plan for ${oneDistinct()}. Follow it as written.${joiner()}${pick(closers)}`,
+      () => `Invite AI to ${pick(tasks)} ${oneDistinct()} and label the result ${quote('v0.1')}.${joiner()}Ship today. ${pick(closers)}`,
+      () => `Let AI triage: close one tab, archive one email, send one text.${joiner()}Do them in order. ${pick(closers)}`,
+      () => `Ask AI to rewrite your apology; send it with no emoji.${joiner()}${pick(closers)}`,
+      () => `${maybe(0.6, 'As an act of penance, ')}surrender one choice to AI: ${pick(tasks)} ${oneDistinct()}.${joiner()}${pick(rationales)} ${pick(closers)}`,
+      () => `${maybe(0.6, 'In silent obedience, ')}flip a coin; on heads, accept AI’s first suggestion; on tails, accept its second.${joiner()}${pick(rationales)} ${pick(closers)}`,
+      () => `Ask AI to generate a three‑box checklist for ${oneDistinct()}.${joiner()}Check them today. ${pick(closers)}`
+    ];
+
+    // Randomly choose a structure; internal randomness makes the space effectively unbounded.
     return pick(frames)();
   }
 
