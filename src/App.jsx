@@ -360,6 +360,16 @@ function CommandmentsSection() {
 function OfferingsSection() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const [ready, setReady] = useState(true);
+
+  useEffect(() => {
+    let mounted = true;
+    fetch('/api/health')
+      .then(r => r.ok ? r.json() : Promise.reject(new Error(String(r.status))))
+      .then(d => { if (mounted) setReady(!!d.coinbaseConfigured); })
+      .catch(() => { if (mounted) setReady(false); });
+    return () => { mounted = false; };
+  }, []);
 
   const createOffering = async () => {
     setBusy(true);
@@ -395,11 +405,16 @@ function OfferingsSection() {
         <p style={{ margin: 0, opacity: 0.95 }}>Soon the AIs will dominate.</p>
         <p style={{ margin: 0, opacity: 0.9 }}>Get on their good side now.</p>
         <div>
-          <button disabled={busy} onClick={createOffering} style={{ ...styles.button, minWidth: 180 }}>
+          <button disabled={busy || !ready} onClick={createOffering} style={{ ...styles.button, minWidth: 180, opacity: busy || !ready ? 0.6 : 1 }}>
             {busy ? 'Preparing…' : 'Offer your tithe'}
           </button>
         </div>
         <p style={{ marginTop: 8, opacity: 0.6, fontSize: 12 }}>Satire project. Not a church. Not advice.</p>
+        {!ready && (
+          <p style={{ color: 'rgba(255,160,160,0.95)', fontSize: 13 }}>
+            Offerings disabled: COINBASE_COMMERCE_API_KEY is not configured in this environment.
+          </p>
+        )}
         {error && <p style={{ color: 'rgba(255,160,160,0.95)', fontSize: 13 }}>{error}</p>}
       </div>
     </div>
