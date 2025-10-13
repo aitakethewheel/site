@@ -382,14 +382,13 @@ function OfferingsSection() {
       });
       const text = await res.text();
       const data = (() => { try { return JSON.parse(text); } catch { return null; } })();
-      if (!res.ok) {
-        console.error('Offerings API error', res.status, text);
-        throw new Error(`Request failed: ${res.status}`);
-      }
-      if (data?.hosted_url) {
+      if (res.ok && data?.hosted_url) {
         window.open(data.hosted_url, '_blank', 'noopener');
       } else {
-        throw new Error('No hosted_url in response');
+        const detail = data?.error || data?.details || text || 'Unknown error';
+        console.error('Offerings API error', res.status, detail);
+        setError(`Offerings failed (HTTP ${res.status}). ${String(detail).slice(0, 180)}`);
+        return;
       }
     } catch (e) {
       console.error(e);
