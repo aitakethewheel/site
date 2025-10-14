@@ -58,8 +58,6 @@ export default function App() {
 function Confessional() {
   const [confession, setConfession] = useState('');
   const [penance, setPenance] = useState('');
-  const [counter, setCounter] = useState(0);
-  const [seenHashes, setSeenHashes] = useState([]);
   function Confessional() {
     const [confession, setConfession] = useState('');
     const [penance, setPenance] = useState('');
@@ -90,25 +88,14 @@ function Confessional() {
     }, []);
 
     function advancePenance() {
-      if (!PENANCES.length) return 'No penances available.';
-      const current = PENANCES[index % PENANCES.length];
+      if (!PENANCES.length) return { text: 'No penances available.', usedIndex: 0, total: 0 };
+      const usedIndex = index % PENANCES.length; // 0-based
+      const current = PENANCES[usedIndex];
       const nextIndex = (index + 1) % PENANCES.length;
       setIndex(nextIndex);
-      if (typeof localStorage !== 'undefined') {
-        localStorage.setItem(INDEX_KEY, String(nextIndex));
-      }
-      return current;
+      if (typeof localStorage !== 'undefined') localStorage.setItem(INDEX_KEY, String(nextIndex));
+      return { text: current, usedIndex, total: PENANCES.length };
     }
-    const oneDistinct = () => pick(objects);
-    const multiDistinct = (k) => {
-      const pool = [...objects];
-      const res = [];
-      for (let i = 0; i < k && pool.length; i++) {
-        const j = Math.floor(rng() * pool.length);
-        res.push(pool.splice(j, 1)[0]);
-      }
-      return res;
-    };
 
     const quote = (s) => `“${s}”`;
     const maybe = (prob, txt) => (rng() < prob ? txt : '');
@@ -179,8 +166,9 @@ function Confessional() {
     e.preventDefault();
   const trimmed = confession.trim();
   const headline = trimmed ? `Confession: ${trimmed}` : 'Confession received.';
-  const body = advancePenance();
-  setPenance(`${headline}\nPenance: ${body}`);
+  const { text, usedIndex, total } = advancePenance();
+  const ordinal = `${usedIndex + 1} of ${total}`;
+  setPenance(`${headline}\nPenance (${ordinal}): ${text}`);
     // After submission, there is no unsent text
     setConfession('');
     setWhisper('');
