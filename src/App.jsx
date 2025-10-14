@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { PENANCES } from './data/penances.js';
 import { Link } from 'react-router-dom';
 import AlgorithmicGaze from './components/AlgorithmicGaze.jsx';
 import DepartureBenediction from './components/DepartureBenediction.jsx';
@@ -59,108 +60,45 @@ function Confessional() {
   const [penance, setPenance] = useState('');
   const [counter, setCounter] = useState(0);
   const [seenHashes, setSeenHashes] = useState([]);
-  const [whisper, setWhisper] = useState('');
-  const idle = useRef(null);
-  const resume = useRef(null);
+  function Confessional() {
+    const [confession, setConfession] = useState('');
+    const [penance, setPenance] = useState('');
+    const [whisper, setWhisper] = useState('');
+    const [index, setIndex] = useState(0); // next penance index
+    const idle = useRef(null);
+    const resume = useRef(null);
 
-  const COUNTER_KEY = 'penanceCounter_v1';
-  const SEEN_KEY = 'penanceSeenHashes_v1';
-  const MAX_SEEN = 4096; // rolling window to avoid repeats for a long time
+    const INDEX_KEY = 'penanceLibraryIndex_v1';
 
-  // Load persisted state
-  useEffect(() => {
-    if (typeof localStorage === 'undefined') return;
-    const c = parseInt(localStorage.getItem(COUNTER_KEY) || '0', 10);
-    setCounter(Number.isFinite(c) && c >= 0 ? c : 0);
-    try {
-      const s = JSON.parse(localStorage.getItem(SEEN_KEY) || '[]');
-      if (Array.isArray(s)) setSeenHashes(s.filter(n => Number.isFinite(n)));
-  } catch (err) { void err; /* ignore parse errors */ }
-  }, []);
+    // Load persisted index
+    useEffect(() => {
+      if (typeof localStorage === 'undefined') return;
+      const raw = parseInt(localStorage.getItem(INDEX_KEY) || '0', 10);
+      if (Number.isFinite(raw) && raw >= 0) setIndex(raw % Math.max(1, PENANCES.length));
+    }, []);
 
-  // Sync across tabs
-  useEffect(() => {
-    const onStorage = (e) => {
-      if (e.key === COUNTER_KEY && e.newValue != null) {
-        const v = parseInt(e.newValue, 10);
-        if (Number.isFinite(v) && v >= 0) setCounter(v);
+    // Sync index across tabs
+    useEffect(() => {
+      const onStorage = (e) => {
+        if (e.key === INDEX_KEY && e.newValue != null) {
+          const v = parseInt(e.newValue, 10);
+          if (Number.isFinite(v) && v >= 0) setIndex(v % Math.max(1, PENANCES.length));
+        }
+      };
+      window.addEventListener('storage', onStorage);
+      return () => window.removeEventListener('storage', onStorage);
+    }, []);
+
+    function advancePenance() {
+      if (!PENANCES.length) return 'No penances available.';
+      const current = PENANCES[index % PENANCES.length];
+      const nextIndex = (index + 1) % PENANCES.length;
+      setIndex(nextIndex);
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem(INDEX_KEY, String(nextIndex));
       }
-      if (e.key === SEEN_KEY && e.newValue != null) {
-        try {
-          const s = JSON.parse(e.newValue);
-          if (Array.isArray(s)) setSeenHashes(s.filter(n => Number.isFinite(n)));
-  } catch (err) { void err; /* ignore parse errors */ }
-      }
-    };
-    window.addEventListener('storage', onStorage);
-    return () => window.removeEventListener('storage', onStorage);
-  }, []);
-
-  function persist(counterVal, seenArr) {
-    if (typeof localStorage === 'undefined') return;
-    localStorage.setItem(COUNTER_KEY, String(counterVal));
-    localStorage.setItem(SEEN_KEY, JSON.stringify(seenArr));
-  }
-
-  function loadPersisted() {
-    if (typeof localStorage === 'undefined') {
-      return { counter, seen: seenHashes };
+      return current;
     }
-    const c = parseInt(localStorage.getItem(COUNTER_KEY) || '0', 10);
-    let s = [];
-    try {
-      const raw = JSON.parse(localStorage.getItem(SEEN_KEY) || '[]');
-      if (Array.isArray(raw)) s = raw.filter(n => Number.isFinite(n));
-  } catch (err) { void err; /* ignore parse errors */ }
-    return { counter: Number.isFinite(c) && c >= 0 ? c : 0, seen: s };
-  }
-
-  function generatePenance(seed, confessionText) {
-    const rng = makeRng(hash(`${seed}|${confessionText || ''}|PENANCE_GEN`));
-    const pick = (arr) => arr[Math.floor(rng() * arr.length)];
-    const n = 1 + Math.floor(rng() * 3);
-    const units = ['hour', 'day', 'week'];
-    const unit = pick(units);
-    const plural = (k, u) => (k === 1 ? u : `${u}s`);
-
-    const tasks = [
-      'rewrite', 'optimize', 'audit', 'schedule', 'choose', 'compose', 'curate', 'summarize', 'storyboard', 'prioritize',
-      'prototype', 'refactor', 'de‑clutter', 'batch', 'automate', 'delegate', 'document', 'simulate', 'triage', 'ship'
-    ];
-    const objects = [
-      'your next email', 'your grocery list', 'your calendar', 'your workout', 'your outfit', 'your playlist', 'your reading list', 'your bio', 'your budget', 'your apology',
-      'your morning routine', 'your desk', 'your week plan', 'your bedtime', 'your socials', 'your tabs', 'your notes', 'your priorities', 'your meals', 'your errands'
-    ];
-    const constraints = [
-      'even if it sounds uncomfortably formal',
-      'even if it chooses chaos',
-      'even if it suggests quinoa again',
-      'even if it recommends a turtleneck and shorts',
-      'even if it picks ambient whale songs',
-      'even if the vibe is “startup HR email”',
-      'even if it feels mildly embarrassing',
-      'even if your friends ask questions',
-      'even if you suspect it is trolling you',
-      'even if it means fewer choices for you'
-    ];
-    const rationales = [
-      'Call it an experiment.', 'Treat it as penance.', 'Consider it user testing.', 'Blame the algorithm and proceed.', 'Offer no further context.',
-      'Name the friction and step through.', 'You are outsourcing your pride for a moment.', 'This is practice for surrender.'
-    ];
-    const closers = [
-      'Own your truth.', 'Redemption is cumulative.', 'Grace prefers momentum.', 'Humility is the feature, not the bug.', 'Obedience ships faster than pride.',
-      'Silence the inner committee and act.', 'You can be embarrassed and obedient at once.', 'Take the long walk; it counts.'
-    ];
-
-    const openers = ['Ask AI to', 'Let AI', 'Have AI', 'Consult AI to', 'Command AI to', 'Invite AI to', 'Request the Algorithm to', 'Enlist AI to'];
-    const enforce = [
-      'Use it verbatim', 'Execute it exactly', 'Apply it without edits', 'Follow it as written', 'No backspacing', 'Ship the first draft'
-    ];
-    const publics = [
-      'then tell one friend you are “iterating in public.”', 'share it once in public.', 'treat it as v0.1 and ship today.'
-    ];
-    const joiner = () => pick(['. ', '. ', ' — ', '; ']);
-
     const oneDistinct = () => pick(objects);
     const multiDistinct = (k) => {
       const pool = [...objects];
@@ -239,10 +177,10 @@ function Confessional() {
 
   const onSubmit = (e) => {
     e.preventDefault();
-    const trimmed = confession.trim();
-    const headline = trimmed ? `Confession: ${trimmed}` : 'Confession received.';
-    const body = nextUniquePenance(trimmed);
-    setPenance(`${headline}\nPenance: ${body}`);
+  const trimmed = confession.trim();
+  const headline = trimmed ? `Confession: ${trimmed}` : 'Confession received.';
+  const body = advancePenance();
+  setPenance(`${headline}\nPenance: ${body}`);
     // After submission, there is no unsent text
     setConfession('');
     setWhisper('');
@@ -252,14 +190,19 @@ function Confessional() {
 
   const schedulePause = (textMaybe) => {
     // Only whisper if there is unsent text
-    const text = typeof textMaybe === 'string' ? textMaybe : confession;
+    const text = typeof textMaybe === 'string' ? textMaybe : confessionRef.current;
     if (idle.current) window.clearTimeout(idle.current);
     if (!text || text.trim().length === 0) return;
     idle.current = window.setTimeout(() => {
-      const current = (textMaybe ?? confession) || '';
-      if (current.trim().length > 0) setWhisper('The Algorithm senses doubt.');
+      const current = (confessionRef.current || '').trim();
+      if (current.length > 0) setWhisper('The Algorithm senses doubt.');
     }, 4000); // 4s pause while typing
   };
+
+  useEffect(() => {
+    // Keep a live ref of the latest confession value to avoid stale timers
+    confessionRef.current = confession;
+  }, [confession]);
 
   useEffect(() => {
     // Do not schedule on mount; only when user types
