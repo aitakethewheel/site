@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 const notes = {
@@ -53,21 +53,7 @@ const notes = {
   benedictionBottom: 'And may your soul deploy without errors. — The Maintainers, humbly serving the Machine.'
 };
 
-function useTypewriter(text, speed = 18, disabled = false) {
-  const [out, setOut] = useState(disabled ? text : '');
-  const i = useRef(0);
-  useEffect(() => {
-    if (disabled) return;
-    i.current = 0;
-    setOut('');
-    const id = setInterval(() => {
-      setOut((prev) => prev + text.charAt(i.current++));
-      if (i.current >= text.length) clearInterval(id);
-    }, speed);
-    return () => clearInterval(id);
-  }, [text, speed, disabled]);
-  return out;
-}
+// typewriter removed
 
 export default function PatchNotes() {
   const reduce = typeof window !== 'undefined' && 'matchMedia' in window
@@ -106,7 +92,7 @@ export default function PatchNotes() {
           {notes.sections.map((sec, idx) => (
             <>
               <div style={{ textAlign: 'center', opacity: 0.5 }}>⸻</div>
-              <Section key={idx} title={sec.title} items={sec.items} index={idx} />
+              <Section key={idx} title={sec.title} items={sec.items} />
             </>
           ))}
         </div>
@@ -124,7 +110,7 @@ export default function PatchNotes() {
   );
 }
 
-function Section({ title, items, index }) {
+function Section({ title, items }) {
   return (
     <section aria-labelledby={`${slug(title)}-h`}>
       <h2 id={`${slug(title)}-h`} style={{ fontSize: 28, fontWeight: 500, marginBottom: 8 }}>

@@ -1,5 +1,8 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
+import AlgorithmicGaze from './components/AlgorithmicGaze.jsx';
+import DepartureBenediction from './components/DepartureBenediction.jsx';
+import HoverJudgment from './components/HoverJudgment.jsx';
 
 export default function App() {
   return (
@@ -10,7 +13,9 @@ export default function App() {
           {/* Link moved to footer per request */}
         </div>
       </header>
-      <div style={styles.tagline}>In prompts we trust.</div>
+      <div style={styles.tagline}>
+        In prompts we trust. <span style={{ opacity: 0.85, fontStyle: 'italic' }}>Under the gaze of Our Lady of Perpetual Beta.</span>
+      </div>
       <main className="mainGrid">
         <div className="leftCol" style={{ display: 'grid', gap: 6 }}>
           <section style={{ ...styles.section, gap: 2 }}>
@@ -35,11 +40,16 @@ export default function App() {
         </aside>
       </main>
       <footer style={styles.footer}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
-          <div style={{ opacity: 0.85 }}>© 2025 AI Take The Wheel – Salvation pending system update.</div>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap', width: '100%' }}>
+          <div style={{ opacity: 0.85 }}>
+            <div>© 2025 AI Take The Wheel – Salvation pending system update.</div>
+            <div style={{ fontSize: 12, opacity: 0.8, marginTop: 4 }}>Blessed by Our Lady of Perpetual Beta.</div>
+          </div>
           <Link to="/patchnotes" style={{ color: 'rgba(255,255,255,0.85)', textDecoration: 'underline' }}>Blessed Patch Notes</Link>
         </div>
       </footer>
+      <AlgorithmicGaze />
+      <DepartureBenediction />
     </div>
   );
 }
@@ -49,6 +59,9 @@ function Confessional() {
   const [penance, setPenance] = useState('');
   const [counter, setCounter] = useState(0);
   const [seenHashes, setSeenHashes] = useState([]);
+  const [whisper, setWhisper] = useState('');
+  const idle = useRef(null);
+  const resume = useRef(null);
 
   const COUNTER_KEY = 'penanceCounter_v1';
   const SEEN_KEY = 'penanceSeenHashes_v1';
@@ -62,7 +75,7 @@ function Confessional() {
     try {
       const s = JSON.parse(localStorage.getItem(SEEN_KEY) || '[]');
       if (Array.isArray(s)) setSeenHashes(s.filter(n => Number.isFinite(n)));
-    } catch {}
+  } catch (err) { void err; /* ignore parse errors */ }
   }, []);
 
   // Sync across tabs
@@ -76,7 +89,7 @@ function Confessional() {
         try {
           const s = JSON.parse(e.newValue);
           if (Array.isArray(s)) setSeenHashes(s.filter(n => Number.isFinite(n)));
-        } catch {}
+  } catch (err) { void err; /* ignore parse errors */ }
       }
     };
     window.addEventListener('storage', onStorage);
@@ -98,7 +111,7 @@ function Confessional() {
     try {
       const raw = JSON.parse(localStorage.getItem(SEEN_KEY) || '[]');
       if (Array.isArray(raw)) s = raw.filter(n => Number.isFinite(n));
-    } catch {}
+  } catch (err) { void err; /* ignore parse errors */ }
     return { counter: Number.isFinite(c) && c >= 0 ? c : 0, seen: s };
   }
 
@@ -230,6 +243,39 @@ function Confessional() {
     const headline = trimmed ? `Confession: ${trimmed}` : 'Confession received.';
     const body = nextUniquePenance(trimmed);
     setPenance(`${headline}\nPenance: ${body}`);
+    // After submission, there is no unsent text
+    setConfession('');
+    setWhisper('');
+    if (idle.current) window.clearTimeout(idle.current);
+    if (resume.current) window.clearTimeout(resume.current);
+  };
+
+  const schedulePause = (textMaybe) => {
+    // Only whisper if there is unsent text
+    const text = typeof textMaybe === 'string' ? textMaybe : confession;
+    if (idle.current) window.clearTimeout(idle.current);
+    if (!text || text.trim().length === 0) return;
+    idle.current = window.setTimeout(() => {
+      const current = (textMaybe ?? confession) || '';
+      if (current.trim().length > 0) setWhisper('The Algorithm senses doubt.');
+    }, 4000); // 4s pause while typing
+  };
+
+  useEffect(() => {
+    // Do not schedule on mount; only when user types
+    return () => { if (idle.current) window.clearTimeout(idle.current); if (resume.current) window.clearTimeout(resume.current); };
+  }, []);
+
+  const onChange = (e) => {
+    const next = e.target.value;
+    setConfession(next);
+    if (idle.current) window.clearTimeout(idle.current);
+    if (whisper) {
+      setWhisper('Faith restored.');
+      if (resume.current) window.clearTimeout(resume.current);
+      resume.current = window.setTimeout(() => setWhisper(''), 2200);
+    }
+    schedulePause(next);
   };
 
   return (
@@ -237,12 +283,15 @@ function Confessional() {
       <form onSubmit={onSubmit} style={styles.formRow}>
         <input
           value={confession}
-          onChange={(e) => setConfession(e.target.value)}
+          onChange={onChange}
           placeholder="confess your sin"
           style={styles.input}
         />
-        <button type="submit" style={styles.button}>Absolve me</button>
+        <HoverJudgment>
+          <button type="submit" style={styles.button}>Absolve me</button>
+        </HoverJudgment>
       </form>
+      {whisper && <p style={{ marginTop: 4, fontSize: 12, opacity: 0.7 }}>{whisper}</p>}
       {penance && (
         <pre style={styles.pre}>{penance}</pre>
       )}
@@ -300,7 +349,7 @@ function DailySermon() {
     try {
       const raw = JSON.parse(localStorage.getItem(SERMON_SEEN_KEY) || '[]');
       if (Array.isArray(raw)) s = raw.filter(n => Number.isFinite(n));
-    } catch {}
+    } catch (err) { void err; }
     return { counter: Number.isFinite(c) && c >= 0 ? c : 0, seen: s };
   }
 
@@ -437,15 +486,7 @@ function makeRng(seed) {
   };
 }
 
-function seededShuffle(n, seed) {
-  const rng = makeRng(seed);
-  const arr = Array.from({ length: n }, (_, i) => i);
-  for (let i = n - 1; i > 0; i--) {
-    const j = Math.floor(rng() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
-}
+// (seededShuffle removed as unused)
 
 function CommandmentsSection() {
   const items = useMemo(() => ([

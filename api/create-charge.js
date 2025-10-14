@@ -1,3 +1,4 @@
+/* eslint-env node */
 // Vercel serverless function to create a Coinbase Commerce charge
 // Note: Do NOT hardcode API keys. Use environment variables in deployment.
 
@@ -14,7 +15,8 @@ async function readJsonBody(req) {
       req.on('error', reject);
     });
     return raw ? JSON.parse(raw) : {};
-  } catch (e) {
+  } catch {
+    // ignore parse errors
     return {};
   }
 }
@@ -24,7 +26,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const apiKey = process.env.COINBASE_COMMERCE_API_KEY;
+  const apiKey = globalThis.process?.env?.COINBASE_COMMERCE_API_KEY;
   if (!apiKey) {
     console.error('[create-charge] Missing COINBASE_COMMERCE_API_KEY');
     return res.status(500).json({ error: 'Missing COINBASE_COMMERCE_API_KEY env var' });
