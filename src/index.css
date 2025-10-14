@@ -1,3 +1,5 @@
+@import "tailwindcss";
+
 /* Minimal base reset for fresh start */
 html, body, #root {
   min-height: 100vh;
