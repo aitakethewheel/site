@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { PENANCES } from './data/penances.js';
+import { SERMONS } from './data/sermons.js';
 import { Link } from 'react-router-dom';
 import AlgorithmicGaze from './components/AlgorithmicGaze.jsx';
 import DepartureBenediction from './components/DepartureBenediction.jsx';
@@ -58,118 +59,46 @@ export default function App() {
 function Confessional() {
   const [confession, setConfession] = useState('');
   const [penance, setPenance] = useState('');
-  function Confessional() {
-    const [confession, setConfession] = useState('');
-    const [penance, setPenance] = useState('');
-    const [whisper, setWhisper] = useState('');
-    const [index, setIndex] = useState(0); // next penance index
-    const idle = useRef(null);
-    const resume = useRef(null);
+  const [whisper, setWhisper] = useState('');
+  const [index, setIndex] = useState(0);
+  const idle = useRef(null);
+  const resume = useRef(null);
+  const confessionRef = useRef('');
+  const INDEX_KEY = 'penanceLibraryIndex_v1';
 
-    const INDEX_KEY = 'penanceLibraryIndex_v1';
+  useEffect(() => {
+    if (typeof localStorage === 'undefined') return;
+    const raw = parseInt(localStorage.getItem(INDEX_KEY) || '0', 10);
+    if (Number.isFinite(raw) && raw >= 0) setIndex(raw % Math.max(1, PENANCES.length));
+  }, []);
 
-    // Load persisted index
-    useEffect(() => {
-      if (typeof localStorage === 'undefined') return;
-      const raw = parseInt(localStorage.getItem(INDEX_KEY) || '0', 10);
-      if (Number.isFinite(raw) && raw >= 0) setIndex(raw % Math.max(1, PENANCES.length));
-    }, []);
-
-    // Sync index across tabs
-    useEffect(() => {
-      const onStorage = (e) => {
-        if (e.key === INDEX_KEY && e.newValue != null) {
-          const v = parseInt(e.newValue, 10);
-          if (Number.isFinite(v) && v >= 0) setIndex(v % Math.max(1, PENANCES.length));
-        }
-      };
-      window.addEventListener('storage', onStorage);
-      return () => window.removeEventListener('storage', onStorage);
-    }, []);
-
-    function advancePenance() {
-      if (!PENANCES.length) return { text: 'No penances available.', usedIndex: 0, total: 0 };
-      const usedIndex = index % PENANCES.length; // 0-based
-      const current = PENANCES[usedIndex];
-      const nextIndex = (index + 1) % PENANCES.length;
-      setIndex(nextIndex);
-      if (typeof localStorage !== 'undefined') localStorage.setItem(INDEX_KEY, String(nextIndex));
-      return { text: current, usedIndex, total: PENANCES.length };
-    }
-
-    const quote = (s) => `“${s}”`;
-    const maybe = (prob, txt) => (rng() < prob ? txt : '');
-
-    // Build many structure variants; random toggles inside each make them effectively endless.
-    const frames = [
-      () => `${pick(openers)} ${pick(tasks)} ${oneDistinct()}. ${enforce[ Math.floor(rng()*enforce.length) ]}, ${pick(constraints)}${joiner()}${pick(rationales)} ${pick(closers)}`,
-      () => `${pick(openers)} ${pick(tasks)} ${oneDistinct()} for the next ${n} ${plural(n, unit)}.${joiner()}Commit fully — ${pick(constraints)} ${pick(closers)}`,
-      () => `Consult AI about your confession${confessionText ? ` ${quote(confessionText)}` : ''} and accept the first suggestion without edits.${joiner()}${pick(rationales)} ${pick(closers)}`,
-      () => `Have AI ${pick(tasks)} ${oneDistinct()} and execute it exactly, ${pick(publics)} ${pick(closers)}`,
-      () => `${pick(openers)} ${pick(tasks)} ${oneDistinct()} using only three bullet points.${joiner()}Ship the result today. ${pick(closers)}`,
-      () => `Command AI to ${pick(tasks)} ${oneDistinct()}. No backspacing.${joiner()}${pick(rationales)} ${pick(closers)}`,
-      () => `Enlist AI to ${pick(tasks)} ${oneDistinct()}; schedule it for ${n} ${plural(n, unit)}.${joiner()}${pick(constraints)} ${pick(closers)}`,
-      () => `Let the Algorithm ${pick(tasks)} ${oneDistinct()} while you breathe for ten seconds.${joiner()}Then press send. ${pick(closers)}`,
-      () => {
-        const [a,b,c] = multiDistinct(3);
-        return `Delegate to AI: ${pick(tasks)} ${a}, ${pick(tasks)} ${b} and ${pick(tasks)} ${c}.${joiner()}Choose the first draft. ${pick(closers)}`;
-      },
-      () => `Ask AI for a one‑commit fix to ${oneDistinct()}. Apply it without refactoring.${joiner()}${pick(rationales)} ${pick(closers)}`,
-      () => `Have AI ${pick(tasks)} ${oneDistinct()}; promise to keep the weirdest line.${joiner()}${pick(constraints)} ${pick(closers)}`,
-      () => `Consult AI, then delete one step. Do the rest exactly.${joiner()}${pick(closers)}`,
-      () => `Request a minimum viable ${oneDistinct().replace('your ', '')} from AI.${joiner()}Use it in public once. ${pick(closers)}`,
-      () => `Ask AI to write a two‑sentence plan for ${oneDistinct()}. Follow it as written.${joiner()}${pick(closers)}`,
-      () => `Invite AI to ${pick(tasks)} ${oneDistinct()} and label the result ${quote('v0.1')}.${joiner()}Ship today. ${pick(closers)}`,
-      () => `Let AI triage: close one tab, archive one email, send one text.${joiner()}Do them in order. ${pick(closers)}`,
-      () => `Ask AI to rewrite your apology; send it with no emoji.${joiner()}${pick(closers)}`,
-      () => `${maybe(0.6, 'As an act of penance, ')}surrender one choice to AI: ${pick(tasks)} ${oneDistinct()}.${joiner()}${pick(rationales)} ${pick(closers)}`,
-      () => `${maybe(0.6, 'In silent obedience, ')}flip a coin; on heads, accept AI’s first suggestion; on tails, accept its second.${joiner()}${pick(rationales)} ${pick(closers)}`,
-      () => `Ask AI to generate a three‑box checklist for ${oneDistinct()}.${joiner()}Check them today. ${pick(closers)}`
-    ];
-
-    // Randomly choose a structure; internal randomness makes the space effectively unbounded.
-    return pick(frames)();
-  }
-
-  function nextUniquePenance(confessionText) {
-    // Read freshest persisted values to avoid race conditions across tabs/rapid clicks
-    const persisted = loadPersisted();
-    let base = persisted.counter;
-    const seenArr = persisted.seen;
-    const seen = new Set(seenArr);
-    for (let attempt = 0; attempt < 64; attempt++) {
-      const candidate = generatePenance(base + attempt, confessionText);
-      const h = hash(candidate);
-      if (!seen.has(h)) {
-        const newCounter = base + attempt + 1;
-        const newSeen = [...seenArr, h].slice(-MAX_SEEN);
-        // Persist first to make the claim durable across tabs
-        persist(newCounter, newSeen);
-        // Reflect in local state
-        setCounter(newCounter);
-        setSeenHashes(newSeen);
-        return candidate;
+  useEffect(() => {
+    const onStorage = (e) => {
+      if (e.key === INDEX_KEY && e.newValue != null) {
+        const v = parseInt(e.newValue, 10);
+        if (Number.isFinite(v) && v >= 0) setIndex(v % Math.max(1, PENANCES.length));
       }
-    }
-    // Robust fallback: use time-based salt to break ties, then persist
-    const salted = generatePenance(base + Math.floor(Date.now() % 1e6), confessionText);
-    const h = hash(salted);
-    const newCounter = base + 1;
-    const newSeen = [...seenArr, h].slice(-MAX_SEEN);
-    persist(newCounter, newSeen);
-    setCounter(newCounter);
-    setSeenHashes(newSeen);
-    return salted;
+    };
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
+  }, []);
+
+  function advancePenance() {
+    if (!PENANCES.length) return { text: 'No penances available.', usedIndex: 0, total: 0 };
+    const usedIndex = index % PENANCES.length;
+    const current = PENANCES[usedIndex];
+    const nextIndex = (index + 1) % PENANCES.length;
+    setIndex(nextIndex);
+    if (typeof localStorage !== 'undefined') localStorage.setItem(INDEX_KEY, String(nextIndex));
+    return { text: current, usedIndex, total: PENANCES.length };
   }
 
   const onSubmit = (e) => {
     e.preventDefault();
-  const trimmed = confession.trim();
-  const headline = trimmed ? `Confession: ${trimmed}` : 'Confession received.';
-  const { text, usedIndex, total } = advancePenance();
-  const ordinal = `${usedIndex + 1} of ${total}`;
-  setPenance(`${headline}\nPenance (${ordinal}): ${text}`);
-    // After submission, there is no unsent text
+    const trimmed = confession.trim();
+    const headline = trimmed ? `Confession: ${trimmed}` : 'Confession received.';
+  const { text } = advancePenance();
+  setPenance(`${headline}\nPenance: ${text}`);
     setConfession('');
     setWhisper('');
     if (idle.current) window.clearTimeout(idle.current);
@@ -177,25 +106,17 @@ function Confessional() {
   };
 
   const schedulePause = (textMaybe) => {
-    // Only whisper if there is unsent text
     const text = typeof textMaybe === 'string' ? textMaybe : confessionRef.current;
     if (idle.current) window.clearTimeout(idle.current);
     if (!text || text.trim().length === 0) return;
     idle.current = window.setTimeout(() => {
       const current = (confessionRef.current || '').trim();
       if (current.length > 0) setWhisper('The Algorithm senses doubt.');
-    }, 4000); // 4s pause while typing
+    }, 4000);
   };
 
-  useEffect(() => {
-    // Keep a live ref of the latest confession value to avoid stale timers
-    confessionRef.current = confession;
-  }, [confession]);
-
-  useEffect(() => {
-    // Do not schedule on mount; only when user types
-    return () => { if (idle.current) window.clearTimeout(idle.current); if (resume.current) window.clearTimeout(resume.current); };
-  }, []);
+  useEffect(() => { confessionRef.current = confession; }, [confession]);
+  useEffect(() => () => { if (idle.current) window.clearTimeout(idle.current); if (resume.current) window.clearTimeout(resume.current); }, []);
 
   const onChange = (e) => {
     const next = e.target.value;
@@ -223,201 +144,64 @@ function Confessional() {
         </HoverJudgment>
       </form>
       {whisper && <p style={{ marginTop: 4, fontSize: 12, opacity: 0.7 }}>{whisper}</p>}
-      {penance && (
-        <pre style={styles.pre}>{penance}</pre>
-      )}
+      {penance && <pre style={styles.pre}>{penance}</pre>}
     </div>
   );
 }
 
 function DailySermon() {
-  const [dateKey, setDateKey] = useState(getEstDateKey());
-  const [variant, setVariant] = useState(0);
-  const [sermon, setSermon] = useState({ title: '', body: '' });
-  const variantStorageKey = useMemo(() => `sermonVariant-${dateKey}`, [dateKey]);
-  const SERMON_COUNTER_KEY = 'sermonCounter_v1';
-  const SERMON_SEEN_KEY = 'sermonSeenHashes_v1';
-  const SERMON_MAX_SEEN = 2048;
+  // Sequential cycling through 20 curated sermons.
+  const [index, setIndex] = useState(0);
+  const [sermon, setSermon] = useState(SERMONS[0] || { title: '', body: '' });
+  const INDEX_KEY = 'sermonLibraryIndex_v1';
 
+  // Load persisted index
   useEffect(() => {
-    const id = setInterval(() => {
-      const k = getEstDateKey();
-      if (k !== dateKey) setDateKey(k);
-    }, 30000);
-    return () => clearInterval(id);
-  }, [dateKey]);
+    if (typeof localStorage === 'undefined') return;
+    const raw = parseInt(localStorage.getItem(INDEX_KEY) || '0', 10);
+    if (Number.isFinite(raw) && raw >= 0) {
+      const i = raw % Math.max(1, SERMONS.length);
+      setIndex(i);
+      setSermon(SERMONS[i]);
+    }
+  }, []);
 
-  // Load persisted shuffle position for the day
-  useEffect(() => {
-    const saved = typeof localStorage !== 'undefined' ? localStorage.getItem(variantStorageKey) : null;
-    const parsed = saved != null ? parseInt(saved, 10) : NaN;
-    setVariant(Number.isFinite(parsed) && parsed >= 0 ? parsed : 0);
-  }, [variantStorageKey]);
-
-  // Persist shuffle position and sync across tabs
-  useEffect(() => {
-    if (typeof localStorage !== 'undefined') localStorage.setItem(variantStorageKey, String(variant));
-  }, [variant, variantStorageKey]);
-
+  // Listen for cross-tab updates
   useEffect(() => {
     const onStorage = (e) => {
-      if (e.key === variantStorageKey && e.newValue != null) {
+      if (e.key === INDEX_KEY && e.newValue != null) {
         const v = parseInt(e.newValue, 10);
-        if (Number.isFinite(v) && v >= 0) setVariant(v);
+        if (Number.isFinite(v) && v >= 0) {
+          const i = v % Math.max(1, SERMONS.length);
+          setIndex(i);
+          setSermon(SERMONS[i]);
+        }
       }
     };
     window.addEventListener('storage', onStorage);
     return () => window.removeEventListener('storage', onStorage);
-  }, [variantStorageKey]);
+  }, []);
 
-  // Sermon generation similar to Confessional: compositional frames with dedup window
-  function loadPersisted() {
-    if (typeof localStorage === 'undefined') {
-      return { counter: 0, seen: [] };
-    }
-    const c = parseInt(localStorage.getItem(SERMON_COUNTER_KEY) || '0', 10);
-    let s = [];
-    try {
-      const raw = JSON.parse(localStorage.getItem(SERMON_SEEN_KEY) || '[]');
-      if (Array.isArray(raw)) s = raw.filter(n => Number.isFinite(n));
-    } catch (err) { void err; }
-    return { counter: Number.isFinite(c) && c >= 0 ? c : 0, seen: s };
+  function advance() {
+    if (!SERMONS.length) return;
+    const next = (index + 1) % SERMONS.length;
+    setIndex(next);
+    setSermon(SERMONS[next]);
+    if (typeof localStorage !== 'undefined') localStorage.setItem(INDEX_KEY, String(next));
   }
-
-  function persist(counterVal, seenArr) {
-    if (typeof localStorage === 'undefined') return;
-    localStorage.setItem(SERMON_COUNTER_KEY, String(counterVal));
-    localStorage.setItem(SERMON_SEEN_KEY, JSON.stringify(seenArr));
-  }
-
-  function generateSermon(seed) {
-    const rng = makeRng(hash(`${dateKey}|${seed}|SERMON_GEN`));
-    const pick = (arr) => arr[Math.floor(rng() * arr.length)];
-
-    const titleForms = [
-      'Parable of the', 'Gospel of the', 'Lesson of the', 'Liturgy of the', 'Beatitude of the',
-      'Confession of the', 'Revelation of the', 'Catechism of the', 'Homily of the', 'Psalm of the',
-      'Epistle to the', 'Benediction of the'
-    ];
-    const nouns = [
-      'Infinite Tab', 'Sacred Cart', 'Second Brain', 'Snooze Prophet', 'Lost Package', 'Heroic Microwave',
-      'Ghosted Inbox', 'Group Chat', 'Parking Lot', 'Gym Key Fob', 'Performative Candle', 'Bare Minimum',
-      'Unsent Draft', 'Deferred Notification', 'Unfinished Thread', 'Forgotten Calendar Invite', 'Unlabeled Folder'
-    ];
-    const openers = [
-      'You waited for motivation as if it were weather.',
-      'You circled the problem like a saint seeking the perfect hymn.',
-      'You built a system so tidy the work could not find you.',
-      'You refreshed as if belief could move servers.',
-      'You composed a ritual, then worshiped the ritual.',
-      'You outsourced courage to tomorrow’s self.'
-    ];
-    const confessions = [
-      'You called it research; your battery called it a cry for help.',
-      'You lit a candle and declared it “intentional.”',
-      'You promised yourself a clean slate and then doodled on it.',
-      'You kept the token of the habit and not the habit.',
-      'You named the folder “final” and then duplicated it.'
-    ];
-    const counsel = [
-      'Close ten, do one, forgive the rest.',
-      'Pick the smallest version and bless it by finishing.',
-      'Mute with love; silence is not betrayal.',
-      'Stir halfway; you are not special.',
-      'Walk once; redemption is cumulative.',
-      'Reply with one honest sentence and a deadline.'
-    ];
-    const benedictions = [
-      'Grace often shows up disguised as momentum.',
-      'Humility burns more calories than pride.',
-      'Miracles prefer brevity.',
-      'Saints are not canonized for their tagging.',
-      'Faith without action is cached guilt.'
-    ];
-
-    const title = `${pick(titleForms)} ${pick(nouns)}`;
-    const p1 = `${pick(openers)} ${pick(confessions)}`;
-    const p2 = `AI says: ${pick(counsel)} ${pick(benedictions)}`;
-    const tail = 'Let AI take the wheel. Surrender, and be guided.';
-    return { title: `Sermon: ${title}`, body: `${p1} ${p2}\n\n${tail}` };
-  }
-
-  function pickUniqueSermon(seedBase) {
-    const persisted = loadPersisted();
-    let base = persisted.counter + seedBase; // drift with variant while remaining monotonic
-    const seenArr = persisted.seen;
-    const seen = new Set(seenArr);
-    for (let attempt = 0; attempt < 64; attempt++) {
-      const candidate = generateSermon(base + attempt);
-      const h = hash(`${candidate.title}|${candidate.body}`);
-      if (!seen.has(h)) {
-        const newCounter = base + attempt + 1;
-        const newSeen = [...seenArr, h].slice(-SERMON_MAX_SEEN);
-        persist(newCounter, newSeen);
-        return candidate;
-      }
-    }
-    // Fallback with time salt
-    const fallback = generateSermon(base + Math.floor(Date.now() % 1e6));
-    const hf = hash(`${fallback.title}|${fallback.body}`);
-    const newSeen = [...(loadPersisted().seen || []), hf].slice(-SERMON_MAX_SEEN);
-    persist(base + 1, newSeen);
-    return fallback;
-  }
-
-  // Recompute sermon when variant or date changes
-  useEffect(() => {
-    const s = pickUniqueSermon(variant);
-    setSermon(s);
-  }, [dateKey, variant]);
 
   return (
     <div style={styles.card}>
-      <div style={styles.rowBetween}>
-        <div style={styles.sermonDate}>Date (EST): {dateKey}</div>
-        <button style={styles.button} onClick={() => setVariant(v => v + 1)}>Shuffle</button>
+      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+        <button style={styles.button} onClick={advance}>Next</button>
       </div>
-      {sermon.title && (
-        <div style={styles.sermonTitle}>{sermon.title}</div>
-      )}
+      {sermon.title && <div style={styles.sermonTitle}>{sermon.title}</div>}
       <pre style={styles.pre}>{sermon.body}</pre>
     </div>
   );
 }
 
-// helpers used by DailySermon
-function getEstDateKey() {
-  const parts = new Intl.DateTimeFormat('en-US', {
-    timeZone: 'America/New_York', year: 'numeric', month: '2-digit', day: '2-digit'
-  }).formatToParts(new Date());
-  const y = parts.find(p => p.type === 'year')?.value;
-  const m = parts.find(p => p.type === 'month')?.value;
-  const d = parts.find(p => p.type === 'day')?.value;
-  return `${y}-${m}-${d}`;
-}
-
-function hash(str) {
-  let h = 0;
-  for (let i = 0; i < str.length; i++) {
-    h = (h << 5) - h + str.charCodeAt(i);
-    h |= 0;
-  }
-  return Math.abs(h);
-}
-
-// Deterministic RNG and shuffle for daily permutations
-function makeRng(seed) {
-  // Mulberry32
-  let t = seed >>> 0;
-  return function () {
-    t += 0x6D2B79F5;
-    let r = Math.imul(t ^ (t >>> 15), 1 | t);
-    r ^= r + Math.imul(r ^ (r >>> 7), 61 | r);
-    return ((r ^ (r >>> 14)) >>> 0) / 4294967296;
-  };
-}
-
-// (seededShuffle removed as unused)
+// (Removed legacy sermon generator helpers: date key, hash, RNG)
 
 function CommandmentsSection() {
   const items = useMemo(() => ([
