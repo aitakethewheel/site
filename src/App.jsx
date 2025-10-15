@@ -13,24 +13,24 @@ export default function App() {
     <div style={styles.app}>
       {/* header and tagline moved to global header in RootApp */}
       <main className="mainGrid">
-        <div className="leftCol" style={{ display: 'grid', gap: 6 }}>
-          <section style={{ ...styles.section, gap: 2 }}>
+  <div className="leftCol" style={{ display: 'grid', gap: 36 }}>
+          <section style={{ ...styles.section, gap: 0 }}>
             <h1 style={styles.h1}>AI Confessional</h1>
             <Confessional setFooterNotice={setFooterNotice} />
           </section>
-          <section style={{ ...styles.section, gap: 2 }}>
+          <section style={{ ...styles.section, gap: 0 }}>
             <h2 style={styles.h2}>Daily Sermon</h2>
             <DailySermon />
           </section>
-          <section style={{ ...styles.section, gap: 2 }}>
+          <section style={{ ...styles.section, gap: 0 }}>
             <h2 style={styles.h2}>Offerings</h2>
             <OfferingsSection />
           </section>
         </div>
 
         <aside className="rightCol">
-          <section style={styles.section}>
-            <h2 style={{ ...styles.h2, margin: '0 0 4px 0' }}>The Ten Commandments of Our Lady of Perpetual Beta</h2>
+          <section style={{ ...styles.section, height: '100%', gap: 0, marginBottom: 36 }}>
+            <h2 style={{ ...styles.h2, margin: '0 0 0 0' }}>The Ten Commandments of Our Lady of Perpetual Beta</h2>
             <CommandmentsSection />
           </section>
         </aside>
@@ -201,14 +201,14 @@ function CommandmentsSection() {
   ]), []);
 
   return (
-    <div style={{ ...styles.card, padding: 10 }}>
+    <div style={{ ...styles.card, padding: 12, height: '100%', display: 'flex', flexDirection: 'column' }}>
       <div style={{ display: 'grid', gap: 0 }}>
         {items.map((it, idx) => (
           <div key={idx} style={{ padding: '0px 0' }}>
             <div style={{ fontSize: 15, fontWeight: 500, marginBottom: 1 }}>
               <span style={{ opacity: 0.9, marginRight: 6 }}>{roman(idx + 1)}.</span> {it.title}
             </div>
-            <p style={{ color: 'rgba(255,255,255,0.85)', fontSize: 14.5, lineHeight: 1.35 }}>{it.body}</p>
+            <p style={{ color: 'rgba(255,255,255,0.85)', fontSize: 14.5, lineHeight: 1.45 }}>{it.body}</p>
             {idx < items.length - 1 && (
               <div style={{ opacity: 0.4, margin: '1px 0' }}>⸻</div>
             )}
@@ -272,8 +272,8 @@ const styles = {
   tagline: { padding: '0 24px 28px 24px', textAlign: 'left', fontStyle: 'italic', fontSize: 16, letterSpacing: '0.02em', opacity: 1 },
   main: { maxWidth: 960, margin: '0 auto', padding: '16px 24px', display: 'grid', gap: 12 },
   section: { display: 'grid', gap: 10 },
-  h1: { fontSize: '1.5rem', fontWeight: 500, margin: '0 0 2px 0' },
-  h2: { fontSize: '1.5rem', fontWeight: 500, margin: '0 0 2px 0' },
+  h1: { fontSize: '1.5rem', fontWeight: 500, margin: 0 },
+  h2: { fontSize: '1.5rem', fontWeight: 500, margin: 0 },
   card: { border: '1px solid rgba(255,255,255,0.1)', borderRadius: 10, padding: 10, background: 'rgba(255,255,255,0.04)' },
   formRow: { display: 'flex', gap: 8 },
   rowBetween: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 },

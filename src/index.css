@@ -37,10 +37,7 @@ img { display: block; max-width: 100%; height: auto; }
     gap: 24px;
   }
   .rightCol {
-    position: sticky;
-    top: 12px;
-    align-self: start;
-    height: fit-content;
+    align-self: stretch;
   }
 }
 
