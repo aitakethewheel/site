@@ -1,28 +1,22 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { PENANCES } from './data/penances.js';
 import { SERMONS } from './data/sermons.js';
-import { Link } from 'react-router-dom';
+// import { Link } from 'react-router-dom';
 import AlgorithmicGaze from './components/AlgorithmicGaze.jsx';
 import DepartureBenediction from './components/DepartureBenediction.jsx';
+import SiteFooter from './components/SiteFooter.jsx';
 import HoverJudgment from './components/HoverJudgment.jsx';
 
 export default function App() {
+  const [footerNotice, setFooterNotice] = useState('');
   return (
     <div style={styles.app}>
-      <header style={styles.header}>
-        <div style={styles.headerRow}>
-          <Link to="/" style={{ color: '#fff', textDecoration: 'none' }}>AITakeTheWheel</Link>
-          {/* Link moved to footer per request */}
-        </div>
-      </header>
-      <div style={styles.tagline}>
-        In prompts we trust. <span style={{ opacity: 0.85, fontStyle: 'italic' }}>Under the gaze of Our Lady of Perpetual Beta.</span>
-      </div>
+      {/* header and tagline moved to global header in RootApp */}
       <main className="mainGrid">
         <div className="leftCol" style={{ display: 'grid', gap: 6 }}>
           <section style={{ ...styles.section, gap: 2 }}>
             <h1 style={styles.h1}>AI Confessional</h1>
-            <Confessional />
+            <Confessional setFooterNotice={setFooterNotice} />
           </section>
           <section style={{ ...styles.section, gap: 2 }}>
             <h2 style={styles.h2}>Daily Sermon</h2>
@@ -41,25 +35,16 @@ export default function App() {
           </section>
         </aside>
       </main>
-      <footer style={styles.footer}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap', width: '100%' }}>
-          <div style={{ opacity: 0.85 }}>
-            <div>© 2025 AI Take The Wheel – Salvation pending system update.</div>
-            <div style={{ fontSize: 12, opacity: 0.8, marginTop: 4 }}>Blessed by Our Lady of Perpetual Beta.</div>
-          </div>
-          <Link to="/patchnotes" style={{ color: 'rgba(255,255,255,0.85)', textDecoration: 'underline' }}>Blessed Patch Notes</Link>
-        </div>
-      </footer>
+      <SiteFooter notice={footerNotice} />
       <AlgorithmicGaze />
       <DepartureBenediction />
     </div>
   );
 }
 
-function Confessional() {
+function Confessional({ setFooterNotice = () => {} }) {
   const [confession, setConfession] = useState('');
   const [penance, setPenance] = useState('');
-  const [whisper, setWhisper] = useState('');
   const [index, setIndex] = useState(0);
   const idle = useRef(null);
   const resume = useRef(null);
@@ -111,7 +96,7 @@ function Confessional() {
     if (!text || text.trim().length === 0) return;
     idle.current = window.setTimeout(() => {
       const current = (confessionRef.current || '').trim();
-      if (current.length > 0) setWhisper('The Algorithm senses doubt.');
+      if (current.length > 0) setFooterNotice('The Algorithm senses doubt.');
     }, 4000);
   };
 
@@ -122,11 +107,10 @@ function Confessional() {
     const next = e.target.value;
     setConfession(next);
     if (idle.current) window.clearTimeout(idle.current);
-    if (whisper) {
-      setWhisper('Faith restored.');
-      if (resume.current) window.clearTimeout(resume.current);
-      resume.current = window.setTimeout(() => setWhisper(''), 2200);
-    }
+    // If a footer notice is present, briefly show "Faith restored." then clear
+    if (resume.current) window.clearTimeout(resume.current);
+    setFooterNotice('Faith restored.');
+    resume.current = window.setTimeout(() => setFooterNotice(''), 2200);
     schedulePause(next);
   };
 
@@ -143,7 +127,6 @@ function Confessional() {
           <button type="submit" style={styles.button}>Absolve me</button>
         </HoverJudgment>
       </form>
-      {whisper && <p style={{ marginTop: 4, fontSize: 12, opacity: 0.7 }}>{whisper}</p>}
       {penance && <pre style={styles.pre}>{penance}</pre>}
     </div>
   );
@@ -286,11 +269,9 @@ function roman(n) {
 
 const styles = {
   app: { background: '#000', color: '#fff', minHeight: '100vh', display: 'flex', flexDirection: 'column' },
-  tagline: { padding: '0 24px 16px 24px', textAlign: 'left', fontStyle: 'italic', fontSize: 16, letterSpacing: '0.02em', opacity: 1 },
-  header: { padding: '14px 24px 0 24px', borderBottom: '1px solid rgba(255,255,255,0.1)', fontWeight: 600, fontSize: 20, lineHeight: 1.15 },
-  headerRow: { display: 'flex', alignItems: 'center', justifyContent: 'space-between' },
+  tagline: { padding: '0 24px 28px 24px', textAlign: 'left', fontStyle: 'italic', fontSize: 16, letterSpacing: '0.02em', opacity: 1 },
   main: { maxWidth: 960, margin: '0 auto', padding: '16px 24px', display: 'grid', gap: 12 },
-  section: { display: 'grid', gap: 8 },
+  section: { display: 'grid', gap: 10 },
   h1: { fontSize: '1.5rem', fontWeight: 500, margin: '0 0 2px 0' },
   h2: { fontSize: '1.5rem', fontWeight: 500, margin: '0 0 2px 0' },
   card: { border: '1px solid rgba(255,255,255,0.1)', borderRadius: 10, padding: 10, background: 'rgba(255,255,255,0.04)' },
