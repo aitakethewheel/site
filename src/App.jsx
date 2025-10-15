@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { PENANCES } from './data/penances.js';
 import { SERMONS } from './data/sermons.js';
 // import { Link } from 'react-router-dom';
-import AlgorithmicGaze from './components/AlgorithmicGaze.jsx';
 import DepartureBenediction from './components/DepartureBenediction.jsx';
 import SiteFooter from './components/SiteFooter.jsx';
 import HoverJudgment from './components/HoverJudgment.jsx';
@@ -16,7 +15,7 @@ export default function App() {
   <div className="leftCol" style={{ display: 'grid', gap: 36 }}>
           <section style={{ ...styles.section, gap: 0 }}>
             <h1 style={styles.h1}>AI Confessional</h1>
-            <Confessional setFooterNotice={setFooterNotice} />
+            <Confessional />
           </section>
           <section style={{ ...styles.section, gap: 0 }}>
             <h2 style={styles.h2}>Daily Sermon</h2>
@@ -35,20 +34,16 @@ export default function App() {
           </section>
         </aside>
       </main>
-      <SiteFooter notice={footerNotice} />
-      <AlgorithmicGaze />
+  <SiteFooter notice={footerNotice} />
       <DepartureBenediction />
     </div>
   );
 }
 
-function Confessional({ setFooterNotice = () => {} }) {
+function Confessional() {
   const [confession, setConfession] = useState('');
   const [penance, setPenance] = useState('');
   const [index, setIndex] = useState(0);
-  const idle = useRef(null);
-  const resume = useRef(null);
-  const confessionRef = useRef('');
   const INDEX_KEY = 'penanceLibraryIndex_v1';
 
   useEffect(() => {
@@ -85,33 +80,14 @@ function Confessional({ setFooterNotice = () => {} }) {
   const { text } = advancePenance();
   setPenance(`${headline}\nPenance: ${text}`);
     setConfession('');
-    setWhisper('');
-    if (idle.current) window.clearTimeout(idle.current);
-    if (resume.current) window.clearTimeout(resume.current);
   };
 
-  const schedulePause = (textMaybe) => {
-    const text = typeof textMaybe === 'string' ? textMaybe : confessionRef.current;
-    if (idle.current) window.clearTimeout(idle.current);
-    if (!text || text.trim().length === 0) return;
-    idle.current = window.setTimeout(() => {
-      const current = (confessionRef.current || '').trim();
-      if (current.length > 0) setFooterNotice('The Algorithm senses doubt.');
-    }, 4000);
-  };
-
-  useEffect(() => { confessionRef.current = confession; }, [confession]);
-  useEffect(() => () => { if (idle.current) window.clearTimeout(idle.current); if (resume.current) window.clearTimeout(resume.current); }, []);
+  // Inactivity popup fully removed
 
   const onChange = (e) => {
     const next = e.target.value;
     setConfession(next);
-    if (idle.current) window.clearTimeout(idle.current);
-    // If a footer notice is present, briefly show "Faith restored." then clear
-    if (resume.current) window.clearTimeout(resume.current);
-    setFooterNotice('Faith restored.');
-    resume.current = window.setTimeout(() => setFooterNotice(''), 2200);
-    schedulePause(next);
+    // Simply update the confession text; no notices or idle timers
   };
 
   return (
