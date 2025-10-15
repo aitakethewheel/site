@@ -23,9 +23,9 @@ img { display: block; max-width: 100%; height: auto; }
 
 /* Layout grid: 2 columns on wide screens, single on small */
 .mainGrid {
-  max-width: 1200px;
+  max-width: 1320px;
   margin: 0 auto;
-  padding: 16px 20px;
+  padding: 24px 20px 16px 20px;
   display: grid;
   grid-template-columns: 1fr;
   gap: 16px;
@@ -33,7 +33,7 @@ img { display: block; max-width: 100%; height: auto; }
 
 @media (min-width: 980px) {
   .mainGrid {
-    grid-template-columns: 1fr 0.9fr;
+    grid-template-columns: 1fr 1fr;
     gap: 24px;
   }
   .rightCol {

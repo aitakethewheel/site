@@ -36,7 +36,7 @@ export default function App() {
 
         <aside className="rightCol">
           <section style={styles.section}>
-            <h2 style={{ ...styles.h2, fontSize: '1.25rem', margin: '0 0 4px 0' }}>The Ten Commandments of Our Lady of Perpetual Beta</h2>
+            <h2 style={{ ...styles.h2, margin: '0 0 4px 0' }}>The Ten Commandments of Our Lady of Perpetual Beta</h2>
             <CommandmentsSection />
           </section>
         </aside>
@@ -192,10 +192,10 @@ function DailySermon() {
 
   return (
     <div style={styles.card}>
-      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-        <button style={styles.button} onClick={advance}>Next</button>
+      <div style={styles.sermonHeaderRow}>
+        {sermon.title && <div style={styles.sermonTitle}>{sermon.title}</div>}
+        <button style={{ ...styles.button, marginLeft: 8 }} onClick={advance}>Next</button>
       </div>
-      {sermon.title && <div style={styles.sermonTitle}>{sermon.title}</div>}
       <pre style={styles.pre}>{sermon.body}</pre>
     </div>
   );
@@ -286,20 +286,21 @@ function roman(n) {
 
 const styles = {
   app: { background: '#000', color: '#fff', minHeight: '100vh', display: 'flex', flexDirection: 'column' },
-  tagline: { padding: '0 24px 6px 24px', textAlign: 'left', fontStyle: 'italic', fontSize: 16, letterSpacing: '0.02em', opacity: 1 },
+  tagline: { padding: '0 24px 16px 24px', textAlign: 'left', fontStyle: 'italic', fontSize: 16, letterSpacing: '0.02em', opacity: 1 },
   header: { padding: '14px 24px 0 24px', borderBottom: '1px solid rgba(255,255,255,0.1)', fontWeight: 600, fontSize: 20, lineHeight: 1.15 },
   headerRow: { display: 'flex', alignItems: 'center', justifyContent: 'space-between' },
   main: { maxWidth: 960, margin: '0 auto', padding: '16px 24px', display: 'grid', gap: 12 },
   section: { display: 'grid', gap: 8 },
-  h1: { fontSize: '2rem', fontWeight: 400, margin: '0 0 2px 0' },
+  h1: { fontSize: '1.5rem', fontWeight: 500, margin: '0 0 2px 0' },
   h2: { fontSize: '1.5rem', fontWeight: 500, margin: '0 0 2px 0' },
   card: { border: '1px solid rgba(255,255,255,0.1)', borderRadius: 10, padding: 10, background: 'rgba(255,255,255,0.04)' },
   formRow: { display: 'flex', gap: 8 },
   rowBetween: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
   input: { flex: 1, padding: '10px 12px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.25)', background: 'transparent', color: '#fff' },
   button: { padding: '10px 14px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.35)', background: 'transparent', color: '#fff', cursor: 'pointer' },
-  pre: { whiteSpace: 'pre-wrap', marginTop: 8, background: 'rgba(255,255,255,0.05)', padding: 10, borderRadius: 8, border: '1px solid rgba(255,255,255,0.1)' },
+  pre: { whiteSpace: 'pre-wrap', marginTop: 6, background: 'rgba(255,255,255,0.05)', padding: 10, borderRadius: 8, border: '1px solid rgba(255,255,255,0.1)', fontFamily: 'inherit' },
   sermonDate: { opacity: 0.7, marginBottom: 4, fontSize: 12 },
-  sermonTitle: { fontSize: 18, fontWeight: 600, marginTop: 4 },
+  sermonTitle: { fontSize: 18, fontWeight: 600, margin: 0, textAlign: 'center' },
+  sermonHeaderRow: { display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, margin: '2px 0 4px 0' },
   footer: { marginTop: 'auto', padding: '14px 24px', borderTop: '1px solid rgba(255,255,255,0.1)', opacity: 0.8 }
 };

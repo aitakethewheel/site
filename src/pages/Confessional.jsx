@@ -39,7 +39,11 @@ export default function Confessional() {
         className="w-full max-w-md rounded-xl border px-4 py-3 mb-4"
       />
       <button onClick={runGenerator} className="px-5 py-3 rounded-xl bg-accent-purple text-white font-bold shadow-neon">Receive Penance</button>
-      {output && <pre className="mt-6 bg-neutral-50 border rounded-xl p-4 text-sm whitespace-pre-wrap">{output}</pre>}
+      {output && (
+        <pre className="mt-6 rounded-xl p-4 text-sm whitespace-pre-wrap border border-white/10 bg-white/10 text-white/80">
+          {output}
+        </pre>
+      )}
     </div>
   );
 }

@@ -8,20 +8,8 @@ export default function HoverJudgment({ children }) {
   const onEnter = () => {};
   const onLeave = () => {};
   const onClick = () => {
-    // Show centered popup; no hover tooltips
-    setCenterPopup('Action acknowledged. Contrition recorded.');
-    const hide = () => setCenterPopup("");
-    // Delay binding hide listeners slightly to avoid the same click/move immediately hiding
-    window.setTimeout(() => {
-      document.addEventListener('mousemove', hide, { once: true });
-      document.addEventListener('keydown', hide, { once: true });
-      document.addEventListener('click', hide, { once: true });
-      document.addEventListener('touchstart', hide, { once: true });
-      document.addEventListener('wheel', hide, { once: true, passive: true });
-      document.addEventListener('scroll', hide, { once: true, passive: true });
-    }, 120);
-    // Fallback auto-hide after 3s even if no action occurs
-    window.setTimeout(hide, 3000);
+    // Per request: no centered popup on click.
+    // Keeping the handler to allow future effects if needed, but do nothing now.
   };
 
   useEffect(() => () => { if (t.current) window.clearTimeout(t.current); }, []);
