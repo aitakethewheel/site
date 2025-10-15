@@ -30,5 +30,5 @@ export default function SiteFooter({ notice = '' }) {
 }
 
 const styles = {
-  footer: { marginTop: 'auto', padding: '14px 24px', borderTop: '1px solid rgba(255,255,255,0.1)', opacity: 0.8 }
+  footer: { marginTop: 0, padding: '14px 24px', borderTop: '1px solid rgba(255,255,255,0.1)', opacity: 0.8 }
 };

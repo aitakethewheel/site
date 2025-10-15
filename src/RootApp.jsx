@@ -17,7 +17,7 @@ function AnimatedLayout() {
   return (
     <div className="min-h-screen bg-black text-white">
       <header className="sticky top-0 z-10 border-b border-neutral-800 bg-black/80 backdrop-blur">
-  <div className="max-w-[1320px] mx-auto px-5 py-2 flex items-center justify-start gap-6">
+  <div className="w-full px-6 py-2 flex items-center justify-start gap-6">
           <div className="flex flex-col items-start">
             <Link to="/" className="font-semibold tracking-tight">AITakeTheWheel</Link>
             <div className="text-xs italic text-white/80">In prompts we trust. <span className="opacity-85 not-italic">Under the gaze of Our Lady of Perpetual Beta.</span></div>
