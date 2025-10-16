@@ -5,7 +5,6 @@ import { SERMONS } from './data/sermons.js';
 import DepartureBenediction from './components/DepartureBenediction.jsx';
 import SiteFooter from './components/SiteFooter.jsx';
 import HoverJudgment from './components/HoverJudgment.jsx';
-import halo from './assets/halo.svg';
 import ladyIcon from './assets/Our Lady of Perpetual Beta.png';
 
 export default function App() {
@@ -24,19 +23,19 @@ export default function App() {
             <DailySermon />
           </section>
           <section style={{ ...styles.section, gap: 0 }}>
-            <h2 style={styles.h2}>Offerings</h2>
-            <OfferingsSection />
-          </section>
-          <section style={{ ...styles.section, gap: 0 }}>
             <h2 style={styles.h2}>The Sacred NFT Collection</h2>
             <SacredNFTSection />
           </section>
         </div>
 
-        <aside className="rightCol">
-          <section style={{ ...styles.section, height: '100%', gap: 0, marginBottom: 36 }}>
+        <aside className="rightCol" style={{ display: 'grid', gap: 36 }}>
+          <section style={{ ...styles.section, gap: 0 }}>
             <h2 style={{ ...styles.h2, margin: '0 0 0 0' }}>The Ten Commandments of Our Lady of Perpetual Beta</h2>
             <CommandmentsSection />
+          </section>
+          <section style={{ ...styles.section, gap: 0 }}>
+            <h2 style={styles.h2}>Offerings</h2>
+            <OfferingsSection />
           </section>
         </aside>
       </main>
@@ -243,47 +242,12 @@ function SacredNFTSection() {
   return (
     <div style={{ ...styles.card, paddingTop: 18, paddingBottom: 20 }}>
       <div style={{ display: 'grid', gap: 10, placeItems: 'center' }}>
-        {/* Icon-like framed image */}
-        <div
-          style={{
-            width: 200,
-            borderRadius: 12,
-            border: '1px solid rgba(255,255,255,0.14)',
-            background: 'linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02))',
-            padding: 12,
-            display: 'grid',
-            justifyItems: 'center',
-            position: 'relative',
-          }}
-          aria-label="Icon of Our Lady of Perpetual Beta"
-        >
-          <img
-            src={ladyIcon}
-            alt="Our Lady of Perpetual Beta (icon)"
-            style={{ width: 180, filter: 'grayscale(100%) contrast(1.04)', opacity: 0.98, marginTop: 0, borderRadius: 8 }}
-          />
-          <div
-            style={{
-              width: 40,
-              height: 40,
-              borderRadius: '50%',
-              marginTop: -8,
-              background: 'rgba(255,255,255,0.07)',
-              border: '1px solid rgba(255,255,255,0.18)',
-              boxShadow: '0 0 0 1px rgba(0,0,0,0.25) inset',
-            }}
-          />
-          <div
-            style={{
-              width: 60,
-              height: 74,
-              borderRadius: 12,
-              marginTop: 8,
-              background: 'rgba(255,255,255,0.05)',
-              border: '1px solid rgba(255,255,255,0.14)',
-            }}
-          />
-        </div>
+        {/* Shrine image without extra outline */}
+        <img
+          src={ladyIcon}
+          alt="Our Lady of Perpetual Beta (icon)"
+          style={{ width: 200, maxWidth: '80%', filter: 'grayscale(100%) contrast(1.04)', opacity: 0.98, marginTop: 0, borderRadius: 8 }}
+        />
 
         <p
           style={{
