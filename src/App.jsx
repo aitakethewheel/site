@@ -310,7 +310,7 @@ const styles = {
   section: { display: 'grid', gap: 10 },
   h1: { fontSize: '1.5rem', fontWeight: 500, margin: 0 },
   h2: { fontSize: '1.5rem', fontWeight: 500, margin: 0 },
-  card: { border: '1px solid rgba(255,255,255,0.1)', borderRadius: 10, padding: 10, background: 'rgba(255,255,255,0.04)' },
+  card: { border: '1px solid rgba(255,255,255,0.1)', borderRadius: 10, padding: 10, background: 'rgba(255,255,255,0.04)', width: '100%', maxWidth: 620 },
   formRow: { display: 'flex', gap: 8 },
   rowBetween: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
   input: { flex: 1, padding: '10px 12px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.25)', background: 'transparent', color: '#fff' },
