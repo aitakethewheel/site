@@ -214,17 +214,20 @@ function OfferingsSection() {
             href={checkoutUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="px-4 py-2 bg-white text-black font-semibold rounded-md hover:bg-gray-200 transition"
+            className="transition"
             style={{
               display: 'inline-block',
               padding: '10px 14px',
               borderRadius: 8,
-              background: '#fff',
-              color: '#000',
+              background: '#000',
+              color: '#fff',
+              border: '1px solid rgba(255,255,255,0.35)',
               textDecoration: 'none',
               minWidth: 180,
               textAlign: 'center'
             }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = '#111'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = '#000'; }}
           >
             Offer your tithe
           </a>

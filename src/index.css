@@ -34,7 +34,8 @@ img { display: block; max-width: 100%; height: auto; }
 @media (min-width: 980px) {
   .mainGrid {
     grid-template-columns: 1fr 1fr;
-    gap: 24px;
+    column-gap: 36px; /* wider space between left/right columns */
+    row-gap: 24px;    /* keep vertical rhythm consistent */
   }
   .rightCol {
     align-self: stretch;
