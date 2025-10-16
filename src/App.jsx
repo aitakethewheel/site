@@ -307,7 +307,7 @@ const styles = {
   app: { background: '#000', color: '#fff', minHeight: '100vh', display: 'flex', flexDirection: 'column' },
   tagline: { padding: '0 24px 28px 24px', textAlign: 'left', fontStyle: 'italic', fontSize: 16, letterSpacing: '0.02em', opacity: 1 },
   main: { maxWidth: 960, margin: '0 auto', padding: '16px 24px', display: 'grid', gap: 12 },
-  section: { display: 'grid', gap: 10 },
+  section: { display: 'grid', gap: 10, width: '100%', maxWidth: 620 },
   h1: { fontSize: '1.5rem', fontWeight: 500, margin: 0 },
   h2: { fontSize: '1.5rem', fontWeight: 500, margin: 0 },
   card: { border: '1px solid rgba(255,255,255,0.1)', borderRadius: 10, padding: 10, background: 'rgba(255,255,255,0.04)', width: '100%', maxWidth: 620 },
