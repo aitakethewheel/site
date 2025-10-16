@@ -5,6 +5,7 @@ import { SERMONS } from './data/sermons.js';
 import DepartureBenediction from './components/DepartureBenediction.jsx';
 import SiteFooter from './components/SiteFooter.jsx';
 import HoverJudgment from './components/HoverJudgment.jsx';
+import halo from './assets/halo.svg';
 
 export default function App() {
   const [footerNotice, setFooterNotice] = useState('');
@@ -24,6 +25,10 @@ export default function App() {
           <section style={{ ...styles.section, gap: 0 }}>
             <h2 style={styles.h2}>Offerings</h2>
             <OfferingsSection />
+          </section>
+          <section style={{ ...styles.section, gap: 0 }}>
+            <h2 style={styles.h2}>The Sacred NFT Collection</h2>
+            <SacredNFTSection />
           </section>
         </div>
 
@@ -225,6 +230,96 @@ function OfferingsSection() {
           </a>
         </div>
         <p style={{ marginTop: 8, opacity: 0.6, fontSize: 12 }}>Satire project. Not a church. Not advice.</p>
+      </div>
+    </div>
+  );
+}
+
+function SacredNFTSection() {
+  // Update this with the actual OpenSea collection URL
+  const OPENSEA_URL = 'https://opensea.io/collection/our-lady-of-perpetual-beta';
+
+  return (
+    <div style={{ ...styles.card, paddingTop: 18, paddingBottom: 20 }}>
+      <div style={{ display: 'grid', gap: 10, placeItems: 'center' }}>
+        {/* Icon-like framed image */}
+        <div
+          style={{
+            width: 200,
+            borderRadius: 12,
+            border: '1px solid rgba(255,255,255,0.14)',
+            background: 'linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02))',
+            padding: 12,
+            display: 'grid',
+            justifyItems: 'center',
+            position: 'relative',
+          }}
+          aria-label="Icon of Our Lady of Perpetual Beta"
+        >
+          <img
+            src={halo}
+            alt="Our Lady of Perpetual Beta (icon)"
+            style={{ width: 120, filter: 'grayscale(100%) contrast(1.08)', opacity: 0.95, marginTop: 6 }}
+          />
+          <div
+            style={{
+              width: 40,
+              height: 40,
+              borderRadius: '50%',
+              marginTop: -8,
+              background: 'rgba(255,255,255,0.07)',
+              border: '1px solid rgba(255,255,255,0.18)',
+              boxShadow: '0 0 0 1px rgba(0,0,0,0.25) inset',
+            }}
+          />
+          <div
+            style={{
+              width: 60,
+              height: 74,
+              borderRadius: 12,
+              marginTop: 8,
+              background: 'rgba(255,255,255,0.05)',
+              border: '1px solid rgba(255,255,255,0.14)',
+            }}
+          />
+        </div>
+
+        <p
+          style={{
+            margin: '2px 0 0',
+            textAlign: 'center',
+            maxWidth: 560,
+            fontFamily: 'Georgia, Garamond, serif',
+            fontSize: 13,
+            lineHeight: 1.45,
+            opacity: 0.92,
+          }}
+        >
+          “Own a relic of devotion to Our Lady of Perpetual Beta, forever inscribed on the blockchain.”
+        </p>
+
+        <div style={{ marginTop: 4 }}>
+          <a
+            href={OPENSEA_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="transition"
+            style={{
+              display: 'inline-block',
+              padding: '10px 14px',
+              borderRadius: 8,
+              border: '1px solid rgba(255,255,255,0.35)',
+              background: 'transparent',
+              color: '#fff',
+              textDecoration: 'none',
+              minWidth: 200,
+              textAlign: 'center',
+              boxShadow: '0 0 0 rgba(0,0,0,0)',
+            }}
+          >
+            View on OpenSea
+          </a>
+        </div>
       </div>
     </div>
   );
