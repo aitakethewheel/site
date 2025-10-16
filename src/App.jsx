@@ -6,6 +6,7 @@ import DepartureBenediction from './components/DepartureBenediction.jsx';
 import SiteFooter from './components/SiteFooter.jsx';
 import HoverJudgment from './components/HoverJudgment.jsx';
 import halo from './assets/halo.svg';
+import ladyIcon from './assets/Our Lady of Perpetual Beta.png';
 
 export default function App() {
   const [footerNotice, setFooterNotice] = useState('');
@@ -257,9 +258,9 @@ function SacredNFTSection() {
           aria-label="Icon of Our Lady of Perpetual Beta"
         >
           <img
-            src={halo}
+            src={ladyIcon}
             alt="Our Lady of Perpetual Beta (icon)"
-            style={{ width: 120, filter: 'grayscale(100%) contrast(1.08)', opacity: 0.95, marginTop: 6 }}
+            style={{ width: 180, filter: 'grayscale(100%) contrast(1.04)', opacity: 0.98, marginTop: 0, borderRadius: 8 }}
           />
           <div
             style={{
