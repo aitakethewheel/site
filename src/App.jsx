@@ -239,8 +239,8 @@ function OfferingsSection() {
 }
 
 function SacredNFTSection() {
-  // Update this with the actual OpenSea collection URL
-  const OPENSEA_URL = 'https://opensea.io/collection/our-lady-of-perpetual-beta';
+  // Link to the specific OpenSea item provided by the user
+  const OPENSEA_URL = 'https://opensea.io/item/ethereum/0xc7c0eff52d1bc740fa545ba02272d9b0983f4fce/1';
 
   return (
     <div style={{ ...styles.card, paddingTop: 18, paddingBottom: 20 }}>
