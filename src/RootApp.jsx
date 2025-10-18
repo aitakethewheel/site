@@ -21,7 +21,7 @@ function AnimatedLayout() {
   <div className="w-full px-6 py-2 flex items-center justify-start gap-6">
           <div className="flex flex-col items-start">
             <Link to="/" className="font-semibold tracking-tight">AITakeTheWheel</Link>
-            <div className="text-xs italic text-white/80">In prompts we trust. <span className="opacity-85 not-italic">Under the gaze of Our Lady of Perpetual Beta.</span></div>
+            <div className="text-xs italic text-white/80">In prompts we trust.</div>
           </div>
           <nav className="flex items-center gap-4 ml-auto justify-end">
             {!isHome && (
