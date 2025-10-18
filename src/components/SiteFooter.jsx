@@ -7,7 +7,6 @@ export default function SiteFooter({ notice = '' }) {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap', width: '100%' }}>
         <div style={{ opacity: 0.85 }}>
           <div>© 2025 AI Take The Wheel – Salvation pending system update.</div>
-          <div style={{ fontSize: 12, opacity: 0.8, marginTop: 4 }}>Blessed by Our Lady of Perpetual Beta.</div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           {notice && (
