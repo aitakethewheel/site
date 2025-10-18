@@ -37,6 +37,14 @@ function AnimatedLayout() {
             >
               Public Confessional
             </Link>
+            <a
+              href="https://opensea.io/item/ethereum/0xc7c0eff52d1bc740fa545ba02272d9b0983f4fce/1"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center rounded-lg border border-white px-3 py-1.5 hover:bg-white/10"
+            >
+              Join the Faith
+            </a>
           </nav>
         </div>
       </header>
