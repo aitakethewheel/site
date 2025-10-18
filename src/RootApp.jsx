@@ -4,6 +4,7 @@ import useRouteFadeOverlay from './hooks/useRouteFadeOverlay.js';
 import Home from './routes/Home.jsx';
 import RedditPage from './pages/Reddit.jsx';
 import PatchNotes from './routes/PatchNotes.jsx';
+import GiftShop from './routes/GiftShop.jsx';
 
 export default function RootApp() {
   return <AnimatedLayout />;
@@ -22,26 +23,17 @@ function AnimatedLayout() {
             <Link to="/" className="font-semibold tracking-tight">AITakeTheWheel</Link>
             <div className="text-xs italic text-white/80">In prompts we trust. <span className="opacity-85 not-italic">Under the gaze of Our Lady of Perpetual Beta.</span></div>
           </div>
-          <nav className="flex items-center gap-3 text-sm ml-auto justify-end">
+          <nav className="flex items-center gap-4 ml-auto justify-end">
             {!isHome && (
-              <Link
-                to="/"
-                className="inline-flex items-center rounded-lg border border-white px-3 py-1.5 hover:bg-white/10"
-              >
-                Home
-              </Link>
+              <Link to="/" className="nav-link inline-flex items-center rounded-lg border border-white">Home</Link>
             )}
-            <Link
-              to="/reddit"
-              className="inline-flex items-center rounded-lg border border-white px-3 py-1.5 hover:bg-white/10"
-            >
-              Public Confessional
-            </Link>
+            <Link to="/reddit" className="nav-link inline-flex items-center rounded-lg border border-white">Public Confessional</Link>
+            <Link to="/gift-shop" className="nav-link inline-flex items-center rounded-lg border border-white">Gift Shop</Link>
             <a
               href="https://opensea.io/item/ethereum/0xc7c0eff52d1bc740fa545ba02272d9b0983f4fce/1"
               target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center rounded-lg border border-white px-3 py-1.5 hover:bg-white/10"
+              rel="noopener"
+              className="nav-link inline-flex items-center rounded-lg border border-white"
             >
               Join the Faith
             </a>
@@ -53,6 +45,7 @@ function AnimatedLayout() {
           <Route element={<PageShell />}> 
             <Route path="/" element={<Home />} />
             <Route path="/patchnotes" element={<PatchNotes />} />
+            <Route path="/gift-shop" element={<GiftShop />} />
             <Route path="/reddit" element={<RedditPage />} />
           </Route>
         </Routes>
