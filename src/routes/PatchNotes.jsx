@@ -79,7 +79,7 @@ export default function PatchNotes() {
     <div className="min-h-screen bg-black text-white">
   <main style={{ maxWidth: 880, margin: '0 auto', padding: '16px 24px', fontSize: 14.5, lineHeight: 1.45 }}>
         <header style={{ marginBottom: 16 }}>
-          <h1 style={{ fontSize: 40, lineHeight: 1.15, fontWeight: 600, margin: 0 }}>
+          <h1 style={{ fontSize: '1.5rem', lineHeight: 1.15, fontWeight: 600, margin: 0 }}>
             {notes.header.title}
           </h1>
           <p style={{ marginTop: 8, opacity: 0.9 }}>{notes.header.subtitle}</p>
@@ -113,7 +113,7 @@ export default function PatchNotes() {
 function Section({ title, items }) {
   return (
     <section aria-labelledby={`${slug(title)}-h`}>
-      <h2 id={`${slug(title)}-h`} style={{ fontSize: 28, fontWeight: 500, marginBottom: 8 }}>
+      <h2 id={`${slug(title)}-h`} style={{ fontSize: 20, fontWeight: 500, marginBottom: 8 }}>
         {title}
       </h2>
       <ul style={{ display: 'grid', gap: 8, paddingLeft: 24, fontSize: 14.5, lineHeight: 1.45 }}>
