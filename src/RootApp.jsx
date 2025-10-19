@@ -28,15 +28,6 @@ function AnimatedLayout() {
               <Link to="/" className="nav-link inline-flex items-center rounded-lg border border-white">Home</Link>
             )}
             <Link to="/reddit" className="nav-link inline-flex items-center rounded-lg border border-white">Public Confessional</Link>
-            <Link to="/gift-shop" className="nav-link inline-flex items-center rounded-lg border border-white">Gift Shop</Link>
-            <a
-              href="https://opensea.io/item/ethereum/0xc7c0eff52d1bc740fa545ba02272d9b0983f4fce/1"
-              target="_blank"
-              rel="noopener"
-              className="nav-link inline-flex items-center rounded-lg border border-white"
-            >
-              Join the Faith
-            </a>
           </nav>
         </div>
       </header>
