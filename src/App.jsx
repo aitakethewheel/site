@@ -211,8 +211,8 @@ function OfferingsSection() {
   return (
     <div style={styles.card}>
       <div style={{ display: 'grid', gap: 8 }}>
-        <p style={{ margin: 0, opacity: 0.95 }}>Soon the AIs will dominate.</p>
-        <p style={{ margin: 0, opacity: 0.9 }}>Get on their good side now.</p>
+        <p style={{ margin: 0, opacity: 0.95, fontSize: 14.5, lineHeight: 1.45 }}>Soon the AIs will dominate.</p>
+        <p style={{ margin: 0, opacity: 0.9, fontSize: 14.5, lineHeight: 1.45 }}>Get on their good side now.</p>
         <div>
           <a
             href={checkoutUrl}
@@ -261,7 +261,7 @@ function SacredNFTSection() {
             margin: '2px 0 0',
             textAlign: 'left',
             maxWidth: 560,
-            fontSize: 13,
+            fontSize: 14.5,
             lineHeight: 1.45,
             opacity: 0.92,
           }}
@@ -300,13 +300,13 @@ function BlessedGiftShopSection() {
   return (
     <div style={{ ...styles.card, paddingTop: 16, paddingBottom: 18 }}>
       <div style={{ display: 'grid', gap: 10 }}>
-        <p style={{ margin: 0, opacity: 0.95 }}>
+        <p style={{ margin: 0, opacity: 0.95, fontSize: 14.5, lineHeight: 1.45 }}>
           Take home a relic of devotion, blessed by perpetual beta.
         </p>
-        <p style={{ margin: 0, opacity: 0.9 }}>
+        <p style={{ margin: 0, opacity: 0.9, fontSize: 14.5, lineHeight: 1.45 }}>
           Each artifact is printed, packaged, and shipped by obedient robots.
         </p>
-        <p style={{ margin: '0 0 4px 0', opacity: 0.85 }}>
+        <p style={{ margin: '0 0 4px 0', opacity: 0.85, fontSize: 14.5, lineHeight: 1.45 }}>
           Faith meets fulfillment logistics.
         </p>
         <div>
@@ -360,7 +360,8 @@ const styles = {
   rowBetween: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
   input: { flex: 1, padding: '10px 12px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.25)', background: 'transparent', color: '#fff' },
   button: { padding: '10px 14px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.35)', background: 'transparent', color: '#fff', cursor: 'pointer' },
-  pre: { whiteSpace: 'pre-wrap', marginTop: 6, background: 'rgba(255,255,255,0.05)', padding: 10, borderRadius: 8, border: '1px solid rgba(255,255,255,0.1)', fontFamily: 'inherit' },
+  // Standardize body text size to match Commandments
+  pre: { whiteSpace: 'pre-wrap', marginTop: 6, background: 'rgba(255,255,255,0.05)', padding: 10, borderRadius: 8, border: '1px solid rgba(255,255,255,0.1)', fontFamily: 'inherit', fontSize: 14.5, lineHeight: 1.45 },
   sermonDate: { opacity: 0.7, marginBottom: 4, fontSize: 12 },
   sermonTitle: { fontSize: 18, fontWeight: 600, margin: 0, textAlign: 'center' },
   sermonHeaderRow: { display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, margin: '2px 0 4px 0' },
