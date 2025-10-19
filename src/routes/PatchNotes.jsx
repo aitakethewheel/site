@@ -64,6 +64,11 @@ export default function PatchNotes() {
     // Ensure English document language to avoid locale font quirks
     const prev = document.documentElement.getAttribute('lang');
     document.documentElement.setAttribute('lang', 'en');
+    // Scroll to top when this route loads
+    try {
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+      if (document.scrollingElement) document.scrollingElement.scrollTop = 0;
+    } catch {}
     return () => {
       if (prev) document.documentElement.setAttribute('lang', prev);
       else document.documentElement.removeAttribute('lang');
