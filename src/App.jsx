@@ -261,13 +261,12 @@ function SacredNFTSection() {
             margin: '2px 0 0',
             textAlign: 'left',
             maxWidth: 560,
-            fontFamily: 'Georgia, Garamond, serif',
             fontSize: 13,
             lineHeight: 1.45,
             opacity: 0.92,
           }}
         >
-          “Own a relic of devotion to Our Lady of Perpetual Beta, forever inscribed on the blockchain.”
+          Own a relic of devotion to Our Lady of Perpetual Beta, forever inscribed on the blockchain.
         </p>
 
         <div style={{ marginTop: 4 }}>
