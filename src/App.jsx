@@ -248,7 +248,7 @@ function SacredNFTSection() {
 
   return (
     <div style={{ ...styles.card, paddingTop: 18, paddingBottom: 20 }}>
-      <div style={{ display: 'grid', gap: 10, placeItems: 'center' }}>
+      <div style={{ display: 'grid', gap: 10, placeItems: 'start' }}>
         {/* Shrine image without extra outline */}
         <img
           src={ladyIcon}
@@ -259,7 +259,7 @@ function SacredNFTSection() {
         <p
           style={{
             margin: '2px 0 0',
-            textAlign: 'center',
+            textAlign: 'left',
             maxWidth: 560,
             fontFamily: 'Georgia, Garamond, serif',
             fontSize: 13,
