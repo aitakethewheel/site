@@ -26,6 +26,10 @@ export default function App() {
             <h2 style={styles.h2}>The Sacred NFT Collection</h2>
             <SacredNFTSection />
           </section>
+          <section style={{ ...styles.section, gap: 0 }}>
+            <h2 style={styles.h2}>The Blessed Gift Shop</h2>
+            <BlessedGiftShopSection />
+          </section>
         </div>
 
         <aside className="rightCol" style={{ display: 'grid', gap: 36 }}>
@@ -286,6 +290,45 @@ function SacredNFTSection() {
             }}
           >
             View on OpenSea
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function BlessedGiftShopSection() {
+  return (
+    <div style={{ ...styles.card, paddingTop: 16, paddingBottom: 18 }}>
+      <div style={{ display: 'grid', gap: 10 }}>
+        <p style={{ margin: 0, opacity: 0.95 }}>
+          Take home a relic of devotion, blessed by perpetual beta.
+        </p>
+        <p style={{ margin: 0, opacity: 0.9 }}>
+          Each artifact is printed, packaged, and shipped by obedient robots.
+        </p>
+        <p style={{ margin: '0 0 4px 0', opacity: 0.85 }}>
+          Faith meets fulfillment logistics.
+        </p>
+        <div>
+          <a
+            href="/gift-shop"
+            className="transition"
+            style={{
+              display: 'inline-block',
+              padding: '10px 14px',
+              borderRadius: 8,
+              background: '#000',
+              color: '#fff',
+              border: '1px solid rgba(255,255,255,0.35)',
+              textDecoration: 'none',
+              minWidth: 200,
+              textAlign: 'center'
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = '#111'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = '#000'; }}
+          >
+            Enter the Gift Shop
           </a>
         </div>
       </div>
