@@ -77,7 +77,7 @@ export default function PatchNotes() {
 
   return (
     <div className="min-h-screen bg-black text-white">
-      <main style={{ maxWidth: 880, margin: '0 auto', padding: '16px 24px 18px' }}>
+  <main style={{ maxWidth: 880, margin: '0 auto', padding: '16px 24px', fontSize: 14.5, lineHeight: 1.45 }}>
         <header style={{ marginBottom: 16 }}>
           <h1 style={{ fontSize: 40, lineHeight: 1.15, fontWeight: 600, margin: 0 }}>
             {notes.header.title}
@@ -98,7 +98,7 @@ export default function PatchNotes() {
         </div>
 
         <div style={{ textAlign: 'center', opacity: 0.5, marginTop: 24 }}>⸻</div>
-        <footer style={{ marginTop: 12, fontSize: 14, opacity: 0.85, textAlign: 'center', lineHeight: 1.6 }}>
+        <footer style={{ marginTop: 12, fontSize: 14.5, opacity: 0.85, textAlign: 'center', lineHeight: 1.45 }}>
           <p>{notes.benedictionTop}</p>
           <p>{notes.benedictionBottom}</p>
           <div style={{ marginTop: 16 }}>
@@ -116,9 +116,9 @@ function Section({ title, items }) {
       <h2 id={`${slug(title)}-h`} style={{ fontSize: 28, fontWeight: 500, marginBottom: 8 }}>
         {title}
       </h2>
-      <ul style={{ display: 'grid', gap: 8, paddingLeft: 24 }}>
+      <ul style={{ display: 'grid', gap: 8, paddingLeft: 24, fontSize: 14.5, lineHeight: 1.45 }}>
         {items.map((t, i) => (
-          <li key={i} style={{ opacity: 0.9, lineHeight: 1.65 }}>
+          <li key={i} style={{ opacity: 0.9, lineHeight: 1.45 }}>
             <TypeLine text={t} />
           </li>
         ))}
@@ -133,7 +133,11 @@ function TypeLine({ text }) {
 }
 
 function StatusLine({ text }) {
-  return <p className="mt-3 text-gray-400 text-sm">{text}</p>;
+  return (
+    <p style={{ marginTop: 8, color: 'rgba(156,163,175,1)', fontSize: 14.5, lineHeight: 1.45 }}>
+      {text}
+    </p>
+  );
 }
 
 function slug(s) {
