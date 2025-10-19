@@ -77,23 +77,18 @@ export default function PatchNotes() {
 
   return (
     <div className="min-h-screen bg-black text-white">
-      {/* Top bar with Home link */}
-      <div style={{ padding: '12px 24px', borderBottom: '1px solid rgba(255,255,255,0.15)' }}>
-        <Link to="/" style={{ color: 'rgba(255,255,255,0.8)', textDecoration: 'underline', fontSize: 14 }}>← Home</Link>
-      </div>
-
-      <main style={{ maxWidth: 880, margin: '0 auto', padding: '24px' }}>
-        <header style={{ marginBottom: 24 }}>
+      <main style={{ maxWidth: 880, margin: '0 auto', padding: '16px 24px 18px' }}>
+        <header style={{ marginBottom: 16 }}>
           <h1 style={{ fontSize: 40, lineHeight: 1.15, fontWeight: 600, margin: 0 }}>
             {notes.header.title}
           </h1>
-          <p style={{ marginTop: 12, opacity: 0.9 }}>{notes.header.subtitle}</p>
-          <p style={{ marginTop: 6, opacity: 0.8 }}>{notes.header.issued}</p>
-          <div style={{ margin: '20px 0', textAlign: 'center', opacity: 0.5 }}>⸻</div>
+          <p style={{ marginTop: 8, opacity: 0.9 }}>{notes.header.subtitle}</p>
+          <p style={{ marginTop: 4, opacity: 0.8 }}>{notes.header.issued}</p>
+          <div style={{ margin: '12px 0', textAlign: 'center', opacity: 0.5 }}>⸻</div>
           <StatusLine text={notes.header.status} reduce={reduce} />
         </header>
 
-        <div style={{ display: 'grid', gap: 32 }}>
+        <div style={{ display: 'grid', gap: 20 }}>
           {notes.sections.map((sec, idx) => (
             <>
               <div style={{ textAlign: 'center', opacity: 0.5 }}>⸻</div>
@@ -102,8 +97,8 @@ export default function PatchNotes() {
           ))}
         </div>
 
-        <div style={{ textAlign: 'center', opacity: 0.5, marginTop: 48 }}>⸻</div>
-        <footer style={{ marginTop: 16, fontSize: 14, opacity: 0.85, textAlign: 'center', lineHeight: 1.6 }}>
+        <div style={{ textAlign: 'center', opacity: 0.5, marginTop: 24 }}>⸻</div>
+        <footer style={{ marginTop: 12, fontSize: 14, opacity: 0.85, textAlign: 'center', lineHeight: 1.6 }}>
           <p>{notes.benedictionTop}</p>
           <p>{notes.benedictionBottom}</p>
           <div style={{ marginTop: 16 }}>
