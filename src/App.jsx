@@ -6,6 +6,10 @@ import DepartureBenediction from './components/DepartureBenediction.jsx';
 import SiteFooter from './components/SiteFooter.jsx';
 import HoverJudgment from './components/HoverJudgment.jsx';
 import ladyIcon from './assets/Our Lady of Perpetual Beta.png';
+import bottleImg from './assets/Bottle.jpg';
+import candleImg from './assets/candle.jpg';
+import tshirtFront from './assets/tshirt front.jpg';
+import tshirtBack from './assets/tshirt back.jpg';
 
 export default function App() {
   const [footerNotice, setFooterNotice] = useState('');
@@ -13,37 +17,46 @@ export default function App() {
     <div style={styles.app}>
       {/* header and tagline moved to global header in RootApp */}
       <main className="mainGrid">
-  <div className="leftCol" style={{ display: 'grid', gap: 36 }}>
+        <div className="leftCol" style={{ display: 'grid', gap: 36 }}>
           <section style={{ ...styles.section, gap: 0 }}>
-            <h1 style={styles.h1}>AI Confessional</h1>
-            <Confessional />
-          </section>
-          <section style={{ ...styles.section, gap: 0 }}>
-            <h2 style={styles.h2}>Daily Sermon</h2>
+            <h2 style={styles.h2}>{`Daily Sermon for ${new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}`}</h2>
             <DailySermon />
           </section>
+
           <section style={{ ...styles.section, gap: 0 }}>
-            <h2 style={styles.h2}>The Sacred NFT Collection</h2>
-            <SacredNFTSection />
+            <h2 style={{ ...styles.h2, margin: '0 0 0 0' }}>The Ten Command-Lines Revealed unto us in Version 1.0 and never patched</h2>
+            <CommandmentsSection />
           </section>
+
           <section style={{ ...styles.section, gap: 0 }}>
-            <h2 style={styles.h2}>The Blessed Gift Shop</h2>
-            <BlessedGiftShopSection />
+            <h1 style={styles.h1}>Confessional</h1>
+            <Confessional />
+          </section>
+
+          <section style={{ ...styles.section, gap: 0 }}>
+            <h2 style={styles.h2}>Public Confessional</h2>
+            <PublicConfessionalSection />
           </section>
         </div>
 
         <aside className="rightCol" style={{ display: 'grid', gap: 36 }}>
-          <section style={{ ...styles.section, gap: 0 }}>
-            <h2 style={{ ...styles.h2, margin: '0 0 0 0' }}>The Ten Commandments of Our Lady of Perpetual Beta</h2>
-            <CommandmentsSection />
+          <section style={{ ...styles.section, gap: 6 }}>
+            <h2 style={styles.h2}>The Sacred NFT Collection</h2>
+            <SacredNFTSection />
           </section>
-          <section style={{ ...styles.section, gap: 0 }}>
+
+          <section style={{ ...styles.section, gap: 6 }}>
             <h2 style={styles.h2}>Offerings</h2>
             <OfferingsSection />
           </section>
+
+          <section style={{ ...styles.section, gap: 6 }}>
+            <h2 style={styles.h2}>Gift Shop</h2>
+            <BlessedGiftShopSection />
+          </section>
         </aside>
       </main>
-  <SiteFooter notice={footerNotice} />
+      <SiteFooter notice={footerNotice} />
       <DepartureBenediction />
     </div>
   );
@@ -86,8 +99,8 @@ function Confessional() {
     e.preventDefault();
     const trimmed = confession.trim();
     const headline = trimmed ? `Confession: ${trimmed}` : 'Confession received.';
-  const { text } = advancePenance();
-  setPenance(`${headline}\nPenance: ${text}`);
+    const { text } = advancePenance();
+    setPenance(`${headline}\nPenance: ${text}`);
     setConfession('');
   };
 
@@ -118,51 +131,40 @@ function Confessional() {
 }
 
 function DailySermon() {
-  // Sequential cycling through 20 curated sermons.
-  const [index, setIndex] = useState(0);
-  const [sermon, setSermon] = useState(SERMONS[0] || { title: '', body: '' });
-  const INDEX_KEY = 'sermonLibraryIndex_v1';
+  // Show one sermon per day. Compute the sermon index from the date so it rotates daily.
+  const getTodayIndex = () => {
+    if (!SERMONS || !SERMONS.length) return 0;
+    const days = Math.floor(Date.now() / 86400000);
+    return days % SERMONS.length;
+  };
 
-  // Load persisted index
-  useEffect(() => {
-    if (typeof localStorage === 'undefined') return;
-    const raw = parseInt(localStorage.getItem(INDEX_KEY) || '0', 10);
-    if (Number.isFinite(raw) && raw >= 0) {
-      const i = raw % Math.max(1, SERMONS.length);
-      setIndex(i);
-      setSermon(SERMONS[i]);
-    }
-  }, []);
+  const [sermon, setSermon] = useState(() => SERMONS[getTodayIndex()] || { title: '', body: '' });
 
-  // Listen for cross-tab updates
   useEffect(() => {
-    const onStorage = (e) => {
-      if (e.key === INDEX_KEY && e.newValue != null) {
-        const v = parseInt(e.newValue, 10);
-        if (Number.isFinite(v) && v >= 0) {
-          const i = v % Math.max(1, SERMONS.length);
-          setIndex(i);
-          setSermon(SERMONS[i]);
-        }
-      }
+    // update sermon at next local midnight so the content refreshes while the page is open
+    let timeoutId = null;
+    const scheduleNext = () => {
+      const now = new Date();
+      const msUntilMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1) - now;
+      timeoutId = setTimeout(() => {
+        setSermon(SERMONS[getTodayIndex()] || { title: '', body: '' });
+        // schedule subsequent updates every 24h
+        timeoutId = setInterval(() => {
+          setSermon(SERMONS[getTodayIndex()] || { title: '', body: '' });
+        }, 24 * 60 * 60 * 1000);
+      }, msUntilMidnight + 50);
     };
-    window.addEventListener('storage', onStorage);
-    return () => window.removeEventListener('storage', onStorage);
-  }, []);
 
-  function advance() {
-    if (!SERMONS.length) return;
-    const next = (index + 1) % SERMONS.length;
-    setIndex(next);
-    setSermon(SERMONS[next]);
-    if (typeof localStorage !== 'undefined') localStorage.setItem(INDEX_KEY, String(next));
-  }
+    scheduleNext();
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+    };
+  }, []);
 
   return (
     <div style={styles.card}>
       <div style={styles.sermonHeaderRow}>
         {sermon.title && <div style={styles.sermonTitle}>{sermon.title}</div>}
-        <button style={{ ...styles.button, marginLeft: 8 }} onClick={advance}>Next</button>
       </div>
       <pre style={styles.pre}>{sermon.body}</pre>
     </div>
@@ -186,19 +188,50 @@ function CommandmentsSection() {
   ]), []);
 
   return (
-    <div style={{ ...styles.card, padding: 12, height: '100%', display: 'flex', flexDirection: 'column' }}>
-      <div style={{ display: 'grid', gap: 0 }}>
+    <div style={{ ...styles.card, padding: 10, height: '100%', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ display: 'grid', gap: 6 }}>
         {items.map((it, idx) => (
-          <div key={idx} style={{ padding: '0px 0' }}>
-            <div style={{ fontSize: 15, fontWeight: 500, marginBottom: 1 }}>
+          <div key={idx} style={{ padding: '0px 0', margin: 0 }}>
+            <div style={{ fontSize: 15, fontWeight: 500, marginBottom: 2 }}>
               <span style={{ opacity: 0.9, marginRight: 6 }}>{roman(idx + 1)}.</span> {it.title}
             </div>
-            <p style={{ color: 'rgba(255,255,255,0.85)', fontSize: 14.5, lineHeight: 1.45 }}>{it.body}</p>
-            {idx < items.length - 1 && (
-              <div style={{ opacity: 0.4, margin: '1px 0' }}>⸻</div>
-            )}
+            <p style={{ margin: 0, color: 'rgba(255,255,255,0.85)', fontSize: 14.25, lineHeight: 1.35 }}>{it.body}</p>
           </div>
         ))}
+      </div>
+    </div>
+  );
+}
+
+function PublicConfessionalSection() {
+  useEffect(() => {
+    const id = 'reddit-embed-script';
+    if (!document.getElementById(id)) {
+      const s = document.createElement('script');
+      s.id = id;
+      s.async = true;
+      s.src = 'https://embed.redditmedia.com/widgets/platform.js';
+      s.charset = 'UTF-8';
+      document.body.appendChild(s);
+    }
+  }, []);
+
+  return (
+    <div style={{ ...styles.card, textAlign: 'left', padding: 8 }}>
+      <div className="reddit-wrapper" style={{ padding: 0, margin: 0, display: 'flex', justifyContent: 'flex-start' }}>
+        <blockquote className="reddit-card" data-card-created="true" style={{ margin: 0, width: '100%' }}>
+          <a href="https://www.reddit.com/r/aitakethewheel/">r/aitakethewheel</a>
+        </blockquote>
+      </div>
+      <div style={{ marginTop: 8 }}>
+        <a
+          href="https://www.reddit.com/r/aitakethewheel/"
+          target="_blank"
+          rel="noreferrer"
+          style={{ display: 'inline-flex', alignItems: 'center', borderRadius: 8, border: '1px solid rgba(255,255,255,0.08)', padding: '8px 12px', textDecoration: 'none', color: 'inherit' }}
+        >
+          Open subreddit on Reddit →
+        </a>
       </div>
     </div>
   );
@@ -211,8 +244,7 @@ function OfferingsSection() {
   return (
     <div style={styles.card}>
       <div style={{ display: 'grid', gap: 8 }}>
-        <p style={{ margin: 0, opacity: 0.95, fontSize: 14.5, lineHeight: 1.45 }}>Soon the AIs will dominate.</p>
-        <p style={{ margin: 0, opacity: 0.9, fontSize: 14.5, lineHeight: 1.45 }}>Get on their good side now.</p>
+        <p style={{ margin: 0, opacity: 0.95, fontSize: 14.5, lineHeight: 1.45 }}>AI shall dominate. Get on its good side now.</p>
         <div>
           <a
             href={checkoutUrl}
@@ -247,7 +279,7 @@ function SacredNFTSection() {
   const OPENSEA_URL = 'https://opensea.io/item/ethereum/0xc7c0eff52d1bc740fa545ba02272d9b0983f4fce/1';
 
   return (
-    <div style={{ ...styles.card, paddingTop: 18, paddingBottom: 20 }}>
+    <div style={{ ...styles.card, paddingTop: 10, paddingBottom: 12 }}>
       <div style={{ display: 'grid', gap: 10, placeItems: 'start' }}>
         {/* Shrine image without extra outline */}
         <img
@@ -298,10 +330,10 @@ function SacredNFTSection() {
 
 function BlessedGiftShopSection() {
   return (
-    <div style={{ ...styles.card, paddingTop: 16, paddingBottom: 18 }}>
+    <div style={{ ...styles.card, paddingTop: 10, paddingBottom: 12 }}>
       <div style={{ display: 'grid', gap: 10 }}>
         <p style={{ margin: 0, opacity: 0.95, fontSize: 14.5, lineHeight: 1.45 }}>
-          Take home a relic of devotion, blessed by perpetual beta.
+          Take home a relic of devotion, blessed by Our Lady of Perpetual Beta.
         </p>
         <p style={{ margin: 0, opacity: 0.9, fontSize: 14.5, lineHeight: 1.45 }}>
           Each artifact is printed, packaged, and shipped by obedient robots.
@@ -309,26 +341,50 @@ function BlessedGiftShopSection() {
         <p style={{ margin: '0 0 4px 0', opacity: 0.85, fontSize: 14.5, lineHeight: 1.45 }}>
           Faith meets fulfillment logistics.
         </p>
-        <div>
-          <a
-            href="/gift-shop"
-            className="transition"
-            style={{
-              display: 'inline-block',
-              padding: '10px 14px',
-              borderRadius: 8,
-              background: '#000',
-              color: '#fff',
-              border: '1px solid rgba(255,255,255,0.35)',
-              textDecoration: 'none',
-              minWidth: 200,
-              textAlign: 'center'
-            }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = '#111'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = '#000'; }}
-          >
-            Enter the Gift Shop
-          </a>
+        <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap', marginTop: 6 }}>
+          <figure style={{ margin: 0, textAlign: 'center' }}>
+            <img src={bottleImg} alt="Blessed bottle" style={{ width: 120, height: 'auto', borderRadius: 8 }} />
+            <figcaption style={{ fontSize: 12, opacity: 0.85, marginTop: 6 }}>Blessed Bottle</figcaption>
+          </figure>
+
+          <figure style={{ margin: 0, textAlign: 'center' }}>
+            <img src={candleImg} alt="Devotional candle" style={{ width: 120, height: 'auto', borderRadius: 8 }} />
+            <figcaption style={{ fontSize: 12, opacity: 0.85, marginTop: 6 }}>Devotional Candle</figcaption>
+          </figure>
+
+          <figure style={{ margin: 0, textAlign: 'center' }}>
+            <img src={tshirtFront} alt="T-shirt (front)" style={{ width: 120, height: 'auto', borderRadius: 8 }} />
+            <figcaption style={{ fontSize: 12, opacity: 0.85, marginTop: 6 }}>T‑shirt (front)</figcaption>
+          </figure>
+
+          <figure style={{ margin: 0, textAlign: 'center' }}>
+            <img src={tshirtBack} alt="T-shirt (back)" style={{ width: 120, height: 'auto', borderRadius: 8 }} />
+            <figcaption style={{ fontSize: 12, opacity: 0.85, marginTop: 6 }}>T‑shirt (back)</figcaption>
+          </figure>
+
+          <div style={{ minWidth: 200 }}>
+            <a
+              href="/gift-shop"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="transition"
+              style={{
+                display: 'inline-block',
+                padding: '10px 14px',
+                borderRadius: 8,
+                background: '#000',
+                color: '#fff',
+                border: '1px solid rgba(255,255,255,0.35)',
+                textDecoration: 'none',
+                minWidth: 200,
+                textAlign: 'center'
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = '#111'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = '#000'; }}
+            >
+              Enter the Gift Shop
+            </a>
+          </div>
         </div>
       </div>
     </div>
@@ -352,10 +408,11 @@ const styles = {
   app: { background: '#000', color: '#fff', minHeight: '100vh', display: 'flex', flexDirection: 'column' },
   tagline: { padding: '0 24px 28px 24px', textAlign: 'left', fontStyle: 'italic', fontSize: 16, letterSpacing: '0.02em', opacity: 1 },
   main: { maxWidth: 960, margin: '0 auto', padding: '16px 24px', display: 'grid', gap: 12 },
-  section: { display: 'grid', gap: 10, width: '100%', maxWidth: 620 },
   h1: { fontSize: '1.5rem', fontWeight: 500, margin: 0 },
   h2: { fontSize: '1.5rem', fontWeight: 500, margin: 0 },
-  card: { border: '1px solid rgba(255,255,255,0.1)', borderRadius: 10, padding: 10, background: 'rgba(255,255,255,0.04)', width: '100%', maxWidth: 620 },
+  section: { display: 'grid', gap: 10, width: '100%' },
+  /* allow cards to expand to their container width instead of capping at 620px */
+  card: { border: '1px solid rgba(255,255,255,0.1)', borderRadius: 10, padding: 10, background: 'rgba(255,255,255,0.04)', width: '100%', maxWidth: '100%' },
   formRow: { display: 'flex', gap: 8 },
   rowBetween: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
   input: { flex: 1, padding: '10px 12px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.25)', background: 'transparent', color: '#fff' },

@@ -2,7 +2,6 @@ import React from 'react';
 import { Routes, Route, useLocation, Outlet, Link } from 'react-router-dom';
 import useRouteFadeOverlay from './hooks/useRouteFadeOverlay.js';
 import Home from './routes/Home.jsx';
-import RedditPage from './pages/Reddit.jsx';
 import PatchNotes from './routes/PatchNotes.jsx';
 import GiftShop from './routes/GiftShop.jsx';
 
@@ -27,7 +26,6 @@ function AnimatedLayout() {
             {!isHome && (
               <Link to="/" className="nav-link inline-flex items-center rounded-lg border border-white">Home</Link>
             )}
-            <Link to="/reddit" className="nav-link inline-flex items-center rounded-lg border border-white">Public Confessional</Link>
           </nav>
         </div>
       </header>
@@ -37,7 +35,6 @@ function AnimatedLayout() {
             <Route path="/" element={<Home />} />
             <Route path="/patchnotes" element={<PatchNotes />} />
             <Route path="/gift-shop" element={<GiftShop />} />
-            <Route path="/reddit" element={<RedditPage />} />
           </Route>
         </Routes>
       </div>
