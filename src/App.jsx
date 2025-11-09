@@ -343,22 +343,30 @@ function BlessedGiftShopSection() {
         </p>
         <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap', marginTop: 6 }}>
           <figure style={{ margin: 0, textAlign: 'center' }}>
-            <img src={bottleImg} alt="Blessed bottle" style={{ width: 120, height: 'auto', borderRadius: 8 }} />
+            <a href="https://giftshop.aitakethewheel.com/product/24181858/ai-take-the-wheel-maars-maker-skinny-matte-tumbler-20oz" target="_blank" rel="noopener noreferrer">
+              <img src={bottleImg} alt="Blessed bottle" style={{ width: 120, height: 'auto', borderRadius: 8 }} />
+            </a>
             <figcaption style={{ fontSize: 12, opacity: 0.85, marginTop: 6 }}>Blessed Bottle</figcaption>
           </figure>
 
           <figure style={{ margin: 0, textAlign: 'center' }}>
-            <img src={candleImg} alt="Devotional candle" style={{ width: 120, height: 'auto', borderRadius: 8 }} />
+            <a href="https://giftshop.aitakethewheel.com/product/24181674/ai-take-the-wheel-scented-soy-candle-9oz" target="_blank" rel="noopener noreferrer">
+              <img src={candleImg} alt="Devotional candle" style={{ width: 120, height: 'auto', borderRadius: 8 }} />
+            </a>
             <figcaption style={{ fontSize: 12, opacity: 0.85, marginTop: 6 }}>Devotional Candle</figcaption>
           </figure>
 
           <figure style={{ margin: 0, textAlign: 'center' }}>
-            <img src={tshirtFront} alt="T-shirt (front)" style={{ width: 120, height: 'auto', borderRadius: 8 }} />
+            <a href="https://giftshop.aitakethewheel.com/product/24179208/ai-take-the-wheel-unisex-t-shirt" target="_blank" rel="noopener noreferrer">
+              <img src={tshirtFront} alt="T-shirt (front)" style={{ width: 120, height: 'auto', borderRadius: 8 }} />
+            </a>
             <figcaption style={{ fontSize: 12, opacity: 0.85, marginTop: 6 }}>T‑shirt (front)</figcaption>
           </figure>
 
           <figure style={{ margin: 0, textAlign: 'center' }}>
-            <img src={tshirtBack} alt="T-shirt (back)" style={{ width: 120, height: 'auto', borderRadius: 8 }} />
+            <a href="https://giftshop.aitakethewheel.com/product/24179208/ai-take-the-wheel-unisex-t-shirt" target="_blank" rel="noopener noreferrer">
+              <img src={tshirtBack} alt="T-shirt (back)" style={{ width: 120, height: 'auto', borderRadius: 8 }} />
+            </a>
             <figcaption style={{ fontSize: 12, opacity: 0.85, marginTop: 6 }}>T‑shirt (back)</figcaption>
           </figure>
 
@@ -382,7 +390,7 @@ function BlessedGiftShopSection() {
               onMouseEnter={(e) => { e.currentTarget.style.background = '#111'; }}
               onMouseLeave={(e) => { e.currentTarget.style.background = '#000'; }}
             >
-              Enter the Gift Shop
+              Discover All Items
             </a>
           </div>
         </div>
