@@ -115,6 +115,32 @@ img { display: block; max-width: 100%; height: auto; }
 }
 .reddit-wrapper .reddit-card { background: transparent !important; }
 
+/* Dark-mode styling for the reddit embed container. */
+.reddit-wrapper {
+  background: #000; /* black container */
+  color: #fff; /* white fallback text */
+  padding: 12px; /* small padding so the card breathes */
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.04);
+}
+
+/* Try to force embed script's generated elements to inherit dark colors where possible. */
+.reddit-wrapper .reddit-card,
+.reddit-wrapper .reddit-card * {
+  background: transparent !important;
+  color: inherit !important;
+  border-color: rgba(255,255,255,0.06) !important;
+}
+
+/* If the embed uses an iframe (cross-origin), we cannot style its contents directly.
+   As a fallback we invert the iframe colors so it appears dark; note this will
+   also invert images inside the iframe. Use only as a last-resort visual patch. */
+.reddit-wrapper .reddit-card iframe {
+  background: transparent !important;
+  /* subtle invert to approximate a dark theme; may affect images */
+  filter: invert(1) hue-rotate(180deg) contrast(0.95);
+}
+
 /* Smaller header buttons */
 .nav-link {
   font-size: 0.875rem; /* 14px */
