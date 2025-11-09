@@ -195,7 +195,7 @@ function CommandmentsSection() {
             <div style={{ fontSize: 15, fontWeight: 500, marginBottom: 2 }}>
               <span style={{ opacity: 0.9, marginRight: 6 }}>{roman(idx + 1)}.</span> {it.title}
             </div>
-            <p style={{ margin: 0, color: 'rgba(255,255,255,0.85)', fontSize: 14.25, lineHeight: 1.35 }}>{it.body}</p>
+            <p style={{ margin: 0, color: 'rgba(255,255,255,0.85)', fontSize: 14.25, lineHeight: 1.35, fontStyle: 'italic' }}>{it.body}</p>
           </div>
         ))}
       </div>
