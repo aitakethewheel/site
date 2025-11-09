@@ -19,7 +19,7 @@ export default function App() {
       <main className="mainGrid">
         <div className="leftCol" style={{ display: 'grid', gap: 36 }}>
           <section style={{ ...styles.section, gap: 0 }}>
-            <h2 style={styles.h2}>{`Daily Sermon for ${new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}`}</h2>
+            <h2 style={{ ...styles.h2, textAlign: 'left' }}>{`Daily Sermon for ${new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}`}</h2>
             <DailySermon />
           </section>
 
@@ -164,7 +164,7 @@ function DailySermon() {
   return (
     <div style={styles.card}>
       <div style={styles.sermonHeaderRow}>
-        {sermon.title && <div style={styles.sermonTitle}>{sermon.title}</div>}
+        {sermon.title && <div style={{ ...styles.sermonTitle, textAlign: 'left' }}>{sermon.title}</div>}
       </div>
       <pre style={styles.pre}>{sermon.body}</pre>
     </div>
@@ -428,7 +428,7 @@ const styles = {
   // Standardize body text size to match Commandments
   pre: { whiteSpace: 'pre-wrap', marginTop: 6, background: 'rgba(255,255,255,0.05)', padding: 10, borderRadius: 8, border: '1px solid rgba(255,255,255,0.1)', fontFamily: 'inherit', fontSize: 14.5, lineHeight: 1.45 },
   sermonDate: { opacity: 0.7, marginBottom: 4, fontSize: 12 },
-  sermonTitle: { fontSize: 18, fontWeight: 600, margin: 0, textAlign: 'center' },
-  sermonHeaderRow: { display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, margin: '2px 0 4px 0' },
+  sermonTitle: { fontSize: 18, fontWeight: 600, margin: 0, textAlign: 'left' },
+  sermonHeaderRow: { display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 8, margin: '2px 0 4px 0' },
   footer: { marginTop: 'auto', padding: '14px 24px', borderTop: '1px solid rgba(255,255,255,0.1)', opacity: 0.8 }
 };
