@@ -41,7 +41,8 @@ img { display: block; max-width: 100%; height: auto; }
   }
 
   .rightCol {
-    align-self: stretch;
+    /* top-justify the stacked frames in the right column */
+    align-self: start;
   }
 }
 
@@ -58,6 +59,15 @@ img { display: block; max-width: 100%; height: auto; }
 
 .rightCol { position: relative; }
 .leftCol { min-width: 0; }
+
+/* Ensure the right column's internal grid aligns items to the top
+   so multiple stacked frames don't distribute vertically. This
+   works whether the column is rendered as grid (inline styles)
+   or as a block element. */
+.mainGrid .rightCol {
+  align-items: start;
+  align-content: start;
+}
 
 /* Make embedded Reddit cards flush-left and remove extra margins the widget may add */
 .reddit-card,
