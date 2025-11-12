@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reddit Dark Embed - r/AITaketheWheel</title>
+<style>
+  :root {
+    --bg: #000;
+    --card: #111;
+    --text: #fff;
+    --muted: #bbb;
+    --border: #2a2a2a;
+    --accent: #ff4500; /* reddit orange */
+    --link: #8ab4ff;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 16px/1.45 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+    padding: 16px;
+  }
+  .header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0 0 16px 0;
+  }
+  .header .logo {
+    width: 36px; height: 36px; border-radius: 50%; background: #ff4500; display: grid; place-items: center; font-weight: 700; color: #000;
+  }
+  .header .title { font-size: 20px; font-weight: 700; }
+  .feed { display: grid; gap: 16px; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+  }
+  .subhead {
+    display:flex; align-items:center; gap:8px; color: var(--muted); font-size: 14px; margin-bottom: 6px;
+  }
+  .post-title { font-size: 20px; font-weight: 700; margin: 6px 0 8px; }
+  .post-body { color: var(--text); }
+  .post-body a { color: var(--link); }
+  .actions {
+    display:flex; align-items:center; gap:16px; margin-top: 12px; padding-top: 12px; border-top:1px solid var(--border);
+    flex-wrap: wrap;
+  }
+  .badge { display:flex; align-items:center; gap:6px; color: var(--muted); font-size: 14px; }
+  .badge.up { color: var(--accent); }
+  .btn {
+    appearance: none; border: 1px solid var(--border); background: transparent; color: var(--text);
+    padding: 8px 12px; border-radius: 999px; cursor: pointer; font-size: 14px;
+  }
+  .btn:hover { border-color: var(--muted); }
+  .view-btn { background: #fff; color: #000; border-color: #fff; font-weight: 700; }
+  .pill {
+    margin-left: auto; display:flex; gap:8px; flex-wrap: wrap;
+  }
+  .hidden { display:none; }
+</style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo">r/</div>
+    <div class="title">AITaketheWheel</div>
+    <a class="btn" href="https://www.reddit.com/r/AITaketheWheel/" target="_blank" rel="noopener">Open subreddit</a>
+  </div>
+
+  <div id="feed" class="feed" role="list"></div>
+
+<script>
+  const FEED_URL = "https://www.reddit.com/r/AITaketheWheel/.json";
+  const feedEl = document.getElementById('feed');
+
+  function timeAgo(utcSeconds) {
+    const secs = Math.max(1, (Date.now() - utcSeconds*1000)/1000);
+    const units = [[31536000,'y'],[2592000,'mo'],[604800,'w'],[86400,'d'],[3600,'h'],[60,'m'],[1,'s']];
+    for (const [dur, label] of units) {
+      if (secs >= dur) return Math.floor(secs/dur) + label;
+    }
+    return "now";
+  }
+
+  function sanitize(html) {
+    // Reddit provides body_html that is already sanitized. We still decode entities and trust tags provided.
+    const txt = document.createElement('textarea'); txt.innerHTML = html || "";
+    return txt.value;
+  }
+
+  function iconUpvote() {
+    return '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 4l7 9h-4v7H9v-7H5z"/></svg>';
+  }
+  function iconComment() {
+    return '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4a2 2 0 0 0-2 2v14l4-4h14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2z"/></svg>';
+  }
+  function iconLink() {
+    return '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M3.9 12a5 5 0 0 1 5-5h3v2h-3a3 3 0 0 0 0 6h3v2h-3a5 5 0 0 1-5-5zm7-1h2v2h-2v-2zm4.1-4h-3v2h3a3 3 0 0 1 0 6h-3v2h3a5 5 0 1 0 0-10z"/></svg>';
+  }
+
+  async function load() {
+    try {
+      const res = await fetch(FEED_URL, {headers: {'Accept': 'application/json'}});
+      const json = await res.json();
+      const posts = (json.data?.children || []).map(c => c.data);
+      if (!posts.length) {
+        feedEl.innerHTML = '<div class="card">No posts found.</div>';
+        return;
+      }
+      feedEl.innerHTML = posts.map(p => renderCard(p)).join('');
+      attachHandlers(posts);
+    } catch (e) {
+      feedEl.innerHTML = '<div class="card">Failed to load subreddit. If you opened this from your file system, try a local server due to CORS.</div>';
+      console.error(e);
+    }
+  }
+
+  function renderCard(p) {
+    const author = p.author;
+    const ago = timeAgo(p.created_utc);
+    const title = p.title || '';
+    const bodyHtml = p.selftext_html ? sanitize(p.selftext_html) : '';
+    const ups = p.ups ?? 0;
+    const comments = p.num_comments ?? 0;
+    const permalink = 'https://www.reddit.com' + p.permalink;
+    const id = p.id;
+
+    return `
+      <article class="card" role="listitem" aria-labelledby="t-${id}">
+        <div class="subhead">
+          <strong>u/${author}</strong>
+          <span>• ${ago} ago</span>
+        </div>
+        <div id="t-${id}" class="post-title">${escapeHtml(title)}</div>
+        ${bodyHtml ? `<div class="post-body">${bodyHtml}</div>` : ''}
+        <div class="actions">
+          <div class="badge up" title="Upvotes">${iconUpvote()} <span>${ups}</span></div>
+          <div class="badge" title="Comments">${iconComment()} <span>${comments}</span></div>
+          <div class="pill">
+            <button class="btn copy" data-link="${permalink}" title="Copy link">${iconLink()} Copy link</button>
+            <a class="btn view-btn" href="${permalink}" target="_blank" rel="noopener">View more on Reddit</a>
+          </div>
+        </div>
+      </article>
+    `;
+  }
+
+  function attachHandlers(posts) {
+    document.querySelectorAll('.btn.copy').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        const link = e.currentTarget.getAttribute('data-link');
+        try {
+          await navigator.clipboard.writeText(link);
+          e.currentTarget.textContent = 'Link copied';
+          setTimeout(() => { e.currentTarget.textContent = 'Copy link'; }, 1500);
+        } catch (err) {
+          window.prompt('Copy this link:', link);
+        }
+      });
+    });
+  }
+
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.innerText = str;
+    return div.innerHTML;
+  }
+
+  load();
+</script>
+</body>
+</html>
