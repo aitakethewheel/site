@@ -9,7 +9,7 @@ import ladyIcon from './assets/Our Lady of Perpetual Beta.png';
 import bottleImg from './assets/Bottle.jpg';
 import candleImg from './assets/candle.jpg';
 import tshirtFront from './assets/tshirt front.jpg';
-import tshirtBack from './assets/tshirt back.jpg';
+import mugImg from './assets/Mug.png';
 
 export default function App() {
   const [footerNotice, setFooterNotice] = useState('');
@@ -365,14 +365,14 @@ function BlessedGiftShopSection() {
             <a href="https://giftshop.aitakethewheel.com/product/24179208/ai-take-the-wheel-unisex-t-shirt" target="_blank" rel="noopener noreferrer">
               <img src={tshirtFront} alt="T-shirt (front)" style={{ width: 120, height: 'auto', borderRadius: 8 }} />
             </a>
-            <figcaption style={{ fontSize: 12, opacity: 0.85, marginTop: 6 }}>T‑shirt (front)</figcaption>
+            <figcaption style={{ fontSize: 12, opacity: 0.85, marginTop: 6 }}>T-shirt</figcaption>
           </figure>
 
           <figure style={{ margin: 0, textAlign: 'center' }}>
-            <a href="https://giftshop.aitakethewheel.com/product/24179208/ai-take-the-wheel-unisex-t-shirt" target="_blank" rel="noopener noreferrer">
-              <img src={tshirtBack} alt="T-shirt (back)" style={{ width: 120, height: 'auto', borderRadius: 8 }} />
+            <a href="https://giftshop.aitakethewheel.com/product/24179577/black-coffee-mug-11oz" target="_blank" rel="noopener noreferrer">
+              <img src={mugImg} alt="Black coffee mug" style={{ width: 120, height: 'auto', borderRadius: 8 }} />
             </a>
-            <figcaption style={{ fontSize: 12, opacity: 0.85, marginTop: 6 }}>T‑shirt (back)</figcaption>
+            <figcaption style={{ fontSize: 12, opacity: 0.85, marginTop: 6 }}>Black Coffee Mug</figcaption>
           </figure>
 
           <div style={{ minWidth: 200 }}>
