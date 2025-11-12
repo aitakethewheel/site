@@ -34,7 +34,7 @@ export default function App() {
           </section>
 
           <section style={{ ...styles.section, gap: 0 }}>
-            <h2 style={styles.h2}>Public Confessional</h2>
+            <h2 style={styles.h2}>Reddit Public Confessional</h2>
             <PublicConfessionalSection />
           </section>
         </div>
@@ -225,8 +225,7 @@ function PublicConfessionalSection() {
 
   return (
     <div style={{ ...styles.card, textAlign: 'left', padding: 8 }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-        <div style={{ fontWeight: 700 }}>Public Confessional</div>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', marginBottom: 8 }}>
         <a
           href="https://www.reddit.com/r/AITaketheWheel/comments/1o78umt/our_lady_of_perpetual_beta_wants_your_confessions/"
           target="_blank"
