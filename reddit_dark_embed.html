@@ -73,7 +73,9 @@
   <div id="feed" class="feed" role="list"></div>
 
 <script>
-  const FEED_URL = "https://www.reddit.com/r/AITaketheWheel/.json";
+  // Use lowercase subreddit path and provide a CORS-proxy fallback when Reddit blocks direct requests
+  const FEED_URL = "https://www.reddit.com/r/aitakethewheel/.json";
+  const FEED_PROXY = (url) => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
   const feedEl = document.getElementById('feed');
 
   function timeAgo(utcSeconds) {
@@ -102,9 +104,34 @@
   }
 
   async function load() {
+    // Try direct fetch first, then fall back to a public CORS proxy.
     try {
-      const res = await fetch(FEED_URL, {headers: {'Accept': 'application/json'}});
-      const json = await res.json();
+      let res = await fetch(FEED_URL, { headers: { 'Accept': 'application/json' }, mode: 'cors' });
+      if (!res.ok) {
+        // try proxy fallback
+        console.warn('Direct fetch failed, trying proxy fallback', res.status);
+        res = await fetch(FEED_PROXY(FEED_URL));
+      }
+
+      // Inspect content-type before attempting to parse as JSON.
+      const contentType = res.headers.get('content-type') || '';
+      let json = null;
+
+      if (contentType.includes('application/json')) {
+        json = await res.json();
+      } else {
+        // Some responses (including block pages) return HTML even through a proxy.
+        // Try to parse body as text and then JSON.parse as a last-ditch attempt.
+        const text = await res.text();
+        try {
+          json = JSON.parse(text);
+        } catch (err) {
+          console.warn('Response was not JSON; showing friendly fallback', err);
+          feedEl.innerHTML = '<div class="card">Posts are unavailable — Reddit is blocking API requests from this environment. Please open the subreddit using the button above.</div>';
+          return;
+        }
+      }
+
       const posts = (json.data?.children || []).map(c => c.data);
       if (!posts.length) {
         feedEl.innerHTML = '<div class="card">No posts found.</div>';
@@ -113,8 +140,8 @@
       feedEl.innerHTML = posts.map(p => renderCard(p)).join('');
       attachHandlers(posts);
     } catch (e) {
-      feedEl.innerHTML = '<div class="card">Failed to load subreddit. If you opened this from your file system, try a local server due to CORS.</div>';
-      console.error(e);
+      console.error('Failed to load subreddit feed:', e);
+      feedEl.innerHTML = '<div class="card">Failed to load subreddit posts. You can open the subreddit directly using the button above.</div>';
     }
   }
 
