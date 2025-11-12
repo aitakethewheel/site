@@ -28,7 +28,21 @@
       }
       .reddit-embed a { color: #8ab4ff !important; }
       /* Reduce font-size inside the embed so it fits better in a framed window */
-      .reddit-embed { font-size: 14px !important; line-height: 1.45 !important; }
+      .reddit-embed { font-size: 13px !important; line-height: 1 !important; }
+      /* Force tighter line spacing for paragraph and list content inside the embed */
+      .reddit-embed p,
+      .reddit-embed li,
+      .reddit-embed .post-body,
+      .reddit-embed .post-title,
+      .reddit-embed .subhead,
+      .reddit-embed .badge,
+      .reddit-embed .actions {
+        line-height: 1 !important;
+        margin-top: 0.25em !important;
+        margin-bottom: 0.25em !important;
+      }
+      /* Slightly reduce the title size so it doesn't dominate */
+      .reddit-embed .post-title { font-size: 16px !important; font-weight: 700 !important; }
       /* Frame window styles for the public confessional inner pane */
       .embed-window { background: #070707; border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; overflow: auto; }
       /* Constrain height to 6 inches as requested and enable internal scrolling */
