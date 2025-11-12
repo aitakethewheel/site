@@ -27,6 +27,12 @@
         color: #fff !important;
       }
       .reddit-embed a { color: #8ab4ff !important; }
+      /* Reduce font-size inside the embed so it fits better in a framed window */
+      .reddit-embed { font-size: 14px !important; line-height: 1.45 !important; }
+      /* Frame window styles for the public confessional inner pane */
+      .embed-window { background: #070707; border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; overflow: auto; }
+      /* Constrain height to 6 inches as requested and enable internal scrolling */
+      .embed-window.constrain-height { height: 6in; max-height: 6in; }
     </style>
   </head>
   <body>

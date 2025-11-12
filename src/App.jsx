@@ -225,15 +225,36 @@ function PublicConfessionalSection() {
 
   return (
     <div style={{ ...styles.card, textAlign: 'left', padding: 8 }}>
-      <div style={{ padding: 0, margin: 0, display: 'flex', justifyContent: 'flex-start' }}>
-        <div
-          className="reddit-embed"
-          red-title="Our Lady of Perpetual Beta wants your confessions"
-          red-href="https://www.reddit.com/r/AITaketheWheel/comments/1o78umt/our_lady_of_perpetual_beta_wants_your_confessions/about.json"
-          style={{ width: '100%', borderRadius: 8 }}
-        />
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+        <div style={{ fontWeight: 700 }}>Public Confessional</div>
+        <a
+          href="https://www.reddit.com/r/AITaketheWheel/comments/1o78umt/our_lady_of_perpetual_beta_wants_your_confessions/"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{
+            padding: '6px 10px',
+            borderRadius: 8,
+            border: '1px solid rgba(255,255,255,0.12)',
+            background: 'transparent',
+            color: '#fff',
+            textDecoration: 'none',
+            fontSize: 13
+          }}
+        >
+          Open in Reddit
+        </a>
       </div>
-      {/* Removed direct subreddit link per request */}
+
+      <div style={{ padding: 0, margin: 0 }}>
+        <div className="embed-window constrain-height" style={{ padding: 10 }}>
+          <div
+            className="reddit-embed"
+            red-title="Our Lady of Perpetual Beta wants your confessions"
+            red-href="https://www.reddit.com/r/AITaketheWheel/comments/1o78umt/our_lady_of_perpetual_beta_wants_your_confessions/about.json"
+            style={{ width: '100%', borderRadius: 8 }}
+          />
+        </div>
+      </div>
     </div>
   );
 }
