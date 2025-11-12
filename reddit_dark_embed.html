@@ -73,7 +73,8 @@
   <div id="feed" class="feed" role="list"></div>
 
 <script>
-  // Use lowercase subreddit path and provide a CORS-proxy fallback when Reddit blocks direct requests
+  // Prefer the server-side proxy to avoid CORS and blocking. Fall back to direct fetch then public proxy.
+  const API_FEED = '/api/reddit';
   const FEED_URL = "https://www.reddit.com/r/aitakethewheel/.json";
   const FEED_PROXY = (url) => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
   const feedEl = document.getElementById('feed');
@@ -104,13 +105,16 @@
   }
 
   async function load() {
-    // Try direct fetch first, then fall back to a public CORS proxy.
+    // Try server-side proxy first (recommended). If that fails, try direct fetch then public proxy.
     try {
-      let res = await fetch(FEED_URL, { headers: { 'Accept': 'application/json' }, mode: 'cors' });
+      let res = await fetch(API_FEED, { headers: { 'Accept': 'application/json' }, mode: 'same-origin' });
       if (!res.ok) {
-        // try proxy fallback
-        console.warn('Direct fetch failed, trying proxy fallback', res.status);
-        res = await fetch(FEED_PROXY(FEED_URL));
+        console.warn('Proxy fetch failed, trying direct fetch', res.status);
+        res = await fetch(FEED_URL, { headers: { 'Accept': 'application/json' }, mode: 'cors' });
+        if (!res.ok) {
+          console.warn('Direct fetch failed, trying public proxy', res.status);
+          res = await fetch(FEED_PROXY(FEED_URL));
+        }
       }
 
       // Inspect content-type before attempting to parse as JSON.
