@@ -126,38 +126,55 @@
   async function load() {
     // Try server-side proxy first (recommended). If that fails, try direct fetch then public proxy.
     try {
-      let res = await fetch(API_FEED, { headers: { 'Accept': 'application/json' }, mode: 'same-origin' });
-      if (!res.ok) {
-        console.warn('Proxy fetch failed, trying direct fetch', res.status);
-        res = await fetch(FEED_URL, { headers: { 'Accept': 'application/json' }, mode: 'cors' });
-        if (!res.ok) {
-          console.warn('Direct fetch failed, trying public proxy', res.status);
-          res = await fetch(FEED_PROXY(FEED_URL));
-        }
-      }
+        // Try sources in order: server-side proxy, direct Reddit, then public proxy.
+        const sources = [
+          { name: 'server-proxy', url: API_FEED, opts: { headers: { 'Accept': 'application/json' }, mode: 'same-origin' } },
+          { name: 'direct', url: FEED_URL, opts: { headers: { 'Accept': 'application/json' }, mode: 'cors' } },
+          { name: 'public-proxy', url: FEED_PROXY(FEED_URL), opts: {} }
+        ];
 
-      // Inspect content-type before attempting to parse as JSON.
-      const contentType = res.headers.get('content-type') || '';
-      let json = null;
-
-      if (contentType.includes('application/json')) {
-        json = await res.json();
-      } else {
-        // Some responses (including block pages) return HTML even through a proxy.
-        // Try to parse body as text and then JSON.parse as a last-ditch attempt.
-        const text = await res.text();
+        let json = null;
+        let lastRes = null;
+        let lastText = '';
+        for (const src of sources) {
           try {
-            json = JSON.parse(text);
-          } catch (err) {
-            console.warn('Response was not JSON; showing friendly fallback', err);
-            // show debug details and fallback card so operators can inspect the upstream response
-            showDebug('parse-fallback', res, text);
-            feedEl.innerHTML = '<div class="card">Posts are unavailable — Reddit is blocking API requests from this environment. Please open the subreddit using the button above.</div>';
-            return;
-          }
-      }
+            const r = await fetch(src.url, src.opts);
+            lastRes = r;
+            const contentType = r.headers.get ? (r.headers.get('content-type') || '') : '';
+            const text = await r.text();
+            lastText = text;
 
-      const posts = (json.data?.children || []).map(c => c.data);
+            // If it's JSON by header, parse and break
+            if (contentType.includes('application/json')) {
+              try { json = JSON.parse(text); } catch (err) { json = null; }
+              if (json) { showDebug(src.name, r, text); break; }
+            }
+
+            // If server returned something obviously non-JSON (JS/HTML), try next source
+            if (/javascript|html|text\//i.test(contentType) || !contentType) {
+              console.warn(`Source ${src.name} returned non-JSON content-type:`, contentType);
+              showDebug(src.name, r, text);
+              continue;
+            }
+
+            // As a last resort try JSON.parse even if header lies
+            try { json = JSON.parse(text); } catch (err) { json = null; }
+            if (json) { showDebug(src.name, r, text); break; }
+          } catch (err) {
+            console.warn('Fetch error for source', src.name, err);
+            showDebug(src.name, null, String(err));
+            continue;
+          }
+        }
+
+        if (!json) {
+          // All attempts failed — show friendly fallback and last debug info
+          showDebug('all-attempts', lastRes, lastText);
+          feedEl.innerHTML = '<div class="card">Posts are unavailable — Reddit is blocking API requests from this environment. Please open the subreddit using the button above.</div>';
+          return;
+        }
+
+        const posts = (json.data?.children || []).map(c => c.data);
       if (!posts.length) {
         feedEl.innerHTML = '<div class="card">No posts found.</div>';
         return;
