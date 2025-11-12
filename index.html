@@ -51,7 +51,43 @@
   </head>
   <body>
     <div id="root"></div>
-    <script>window.onload = function(){ if (window.red && window.red.embedAll) { try { window.red.embedAll(); } catch(e){} } };</script>
+    <script>
+      window.onload = function(){
+        if (window.red && window.red.embedAll) {
+          try { window.red.embedAll(); } catch(e){}
+        }
+
+        // Remove the small "Rendered by Reddit-Embed" credit that the library may inject.
+        // We wait a short time for the embed to render, then remove any nodes containing
+        // the phrase to keep the UI clean. Also observe mutations to catch late injections.
+        function removeCreditNodes() {
+          try {
+            document.querySelectorAll('.reddit-embed *').forEach(el => {
+              if (!el || !el.textContent) return;
+              if (/Rendered by\s*Reddit-Embed/i.test(el.textContent.trim())) {
+                el.remove();
+              }
+            });
+          } catch (e) {
+            /* ignore */
+          }
+        }
+
+        // Run once after a short delay
+        setTimeout(removeCreditNodes, 400);
+
+        // Use a MutationObserver to catch any later insertions and remove them.
+        try {
+          const root = document.querySelector('.reddit-embed');
+          if (root) {
+            const mo = new MutationObserver(() => removeCreditNodes());
+            mo.observe(root, { childList: true, subtree: true });
+            // Stop observing after 10s — enough time for the embed to finish inserting nodes.
+            setTimeout(() => mo.disconnect(), 10000);
+          }
+        } catch (e) { /* ignore */ }
+      };
+    </script>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
