@@ -78,6 +78,25 @@
   const FEED_URL = "https://www.reddit.com/r/aitakethewheel/.json";
   const FEED_PROXY = (url) => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
   const feedEl = document.getElementById('feed');
+  const debugEl = document.createElement('div');
+  debugEl.style.marginTop = '12px';
+  debugEl.style.fontSize = '13px';
+  debugEl.style.color = 'var(--muted)';
+  // small helper to show debug details in the embed when something goes wrong
+  function showDebug(attempt, res, text) {
+    const status = res ? `${res.status} ${res.statusText || ''}`.trim() : 'no-response';
+    const contentType = res ? (res.headers.get ? (res.headers.get('content-type') || '') : '') : '';
+    const snippet = text ? String(text).slice(0, 2000) : '';
+    debugEl.innerHTML = `
+      <div style="margin-top:8px; padding:10px; border-radius:8px; background:rgba(255,255,255,0.02); border:1px solid var(--border)">
+        <div style="font-weight:700; margin-bottom:6px;">Debug — fetch attempt: ${escapeHtml(attempt)}</div>
+        <div style="margin-bottom:6px">Status: <code style="color:var(--muted)">${escapeHtml(status)}</code></div>
+        <div style="margin-bottom:6px">Content-Type: <code style="color:var(--muted)">${escapeHtml(contentType)}</code></div>
+        ${snippet ? `<details style="color:var(--muted)"><summary>Response snippet (first 2k chars)</summary><pre style="white-space:pre-wrap; max-height:260px; overflow:auto; margin-top:8px;">${escapeHtml(snippet)}</pre></details>` : ''}
+      </div>
+    `;
+    if (!feedEl.parentNode.contains(debugEl)) feedEl.parentNode.insertBefore(debugEl, feedEl.nextSibling);
+  }
 
   function timeAgo(utcSeconds) {
     const secs = Math.max(1, (Date.now() - utcSeconds*1000)/1000);
@@ -127,13 +146,15 @@
         // Some responses (including block pages) return HTML even through a proxy.
         // Try to parse body as text and then JSON.parse as a last-ditch attempt.
         const text = await res.text();
-        try {
-          json = JSON.parse(text);
-        } catch (err) {
-          console.warn('Response was not JSON; showing friendly fallback', err);
-          feedEl.innerHTML = '<div class="card">Posts are unavailable — Reddit is blocking API requests from this environment. Please open the subreddit using the button above.</div>';
-          return;
-        }
+          try {
+            json = JSON.parse(text);
+          } catch (err) {
+            console.warn('Response was not JSON; showing friendly fallback', err);
+            // show debug details and fallback card so operators can inspect the upstream response
+            showDebug('parse-fallback', res, text);
+            feedEl.innerHTML = '<div class="card">Posts are unavailable — Reddit is blocking API requests from this environment. Please open the subreddit using the button above.</div>';
+            return;
+          }
       }
 
       const posts = (json.data?.children || []).map(c => c.data);
@@ -145,6 +166,8 @@
       attachHandlers(posts);
     } catch (e) {
       console.error('Failed to load subreddit feed:', e);
+      // network-level failure — show debug box with error
+      showDebug('exception', null, String(e));
       feedEl.innerHTML = '<div class="card">Failed to load subreddit posts. You can open the subreddit directly using the button above.</div>';
     }
   }
