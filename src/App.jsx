@@ -209,35 +209,20 @@ function CommandmentsSection() {
 }
 
 function PublicConfessionalSection() {
-  useEffect(() => {
-    const id = 'reddit-embed-script';
-    if (!document.getElementById(id)) {
-      const s = document.createElement('script');
-      s.id = id;
-      s.async = true;
-      s.src = 'https://embed.redditmedia.com/widgets/platform.js';
-      s.charset = 'UTF-8';
-      document.body.appendChild(s);
-    }
-  }, []);
-
+  // Instead of the embedded reddit script, load the dedicated dark embed HTML
+  // which provides a styled, script-driven feed. This avoids injecting the
+  // reddit embed script into the main document and keeps the styling isolated.
   return (
     <div style={{ ...styles.card, textAlign: 'left', padding: 8 }}>
-      <div className="reddit-wrapper" style={{ padding: 0, margin: 0, display: 'flex', justifyContent: 'flex-start' }}>
-        <blockquote className="reddit-card" data-card-created="true" style={{ margin: 0, width: '100%' }}>
-          <a href="https://www.reddit.com/r/aitakethewheel/">r/aitakethewheel</a>
-        </blockquote>
+      <div style={{ padding: 0, margin: 0, display: 'flex', justifyContent: 'flex-start' }}>
+        <iframe
+          title="r/aitakethewheel (dark embed)"
+          src="/reddit_dark_embed.html"
+          style={{ width: '100%', height: 520, border: 'none', borderRadius: 8 }}
+          sandbox="allow-scripts allow-same-origin allow-popups"
+        />
       </div>
-      <div style={{ marginTop: 8 }}>
-        <a
-          href="https://www.reddit.com/r/aitakethewheel/"
-          target="_blank"
-          rel="noreferrer"
-          style={{ display: 'inline-flex', alignItems: 'center', borderRadius: 8, border: '1px solid rgba(255,255,255,0.08)', padding: '8px 12px', textDecoration: 'none', color: 'inherit' }}
-        >
-          Open subreddit on Reddit →
-        </a>
-      </div>
+      {/* Removed direct subreddit link per request */}
     </div>
   );
 }
