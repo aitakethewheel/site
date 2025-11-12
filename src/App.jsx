@@ -134,7 +134,12 @@ function DailySermon() {
   // Show one sermon per day. Compute the sermon index from the date so it rotates daily.
   const getTodayIndex = () => {
     if (!SERMONS || !SERMONS.length) return 0;
-    const days = Math.floor(Date.now() / 86400000);
+    // Use the user's local midnight to compute the day count so the sermon
+    // advances at the user's local 00:00 rather than at 00:00 UTC.
+    const now = new Date();
+    // localMidnight is the start of the current local day
+    const localMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const days = Math.floor(localMidnight.getTime() / 86400000);
     return days % SERMONS.length;
   };
 
