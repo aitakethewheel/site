@@ -209,17 +209,28 @@ function CommandmentsSection() {
 }
 
 function PublicConfessionalSection() {
-  // Instead of the embedded reddit script, load the dedicated dark embed HTML
-  // which provides a styled, script-driven feed. This avoids injecting the
-  // reddit embed script into the main document and keeps the styling isolated.
+  // Use the reddit-embed library directly in-page. We call red.embedAll() after mount
+  // so the library will transform the container into the embedded post. The CSS for
+  // the library is loaded from CDN in index.html.
+  useEffect(() => {
+    try {
+      if (window.red && typeof window.red.embedAll === 'function') {
+        window.red.embedAll();
+      }
+    } catch (e) {
+      // ignore — embed will remain a placeholder
+      console.warn('reddit embed init failed', e);
+    }
+  }, []);
+
   return (
     <div style={{ ...styles.card, textAlign: 'left', padding: 8 }}>
       <div style={{ padding: 0, margin: 0, display: 'flex', justifyContent: 'flex-start' }}>
-        <iframe
-          title="r/aitakethewheel (dark embed)"
-          src="/reddit_dark_embed.html"
-          style={{ width: '100%', height: 520, border: 'none', borderRadius: 8 }}
-          sandbox="allow-scripts allow-same-origin allow-popups"
+        <div
+          className="reddit-embed"
+          red-title="Our Lady of Perpetual Beta wants your confessions"
+          red-href="https://www.reddit.com/r/AITaketheWheel/comments/1o78umt/our_lady_of_perpetual_beta_wants_your_confessions/about.json"
+          style={{ width: '100%', borderRadius: 8 }}
         />
       </div>
       {/* Removed direct subreddit link per request */}
