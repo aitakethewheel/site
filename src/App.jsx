@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { Analytics } from '@vercel/analytics/react';
 import { PENANCES } from './data/penances.js';
 import { SERMONS } from './data/sermons.js';
 // import { Link } from 'react-router-dom';
@@ -58,6 +59,7 @@ export default function App() {
       </main>
       <SiteFooter notice={footerNotice} />
       <DepartureBenediction />
+      <Analytics />
     </div>
   );
 }
